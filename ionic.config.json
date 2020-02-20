@@ -1,0 +1,7 @@
+{
+  "name": "keeper",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
