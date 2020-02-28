@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
+import { isLoggedIn } from '../pages/auth/guard/auth.guard';
 
 const routes: Routes = [
   {
@@ -8,45 +9,45 @@ const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: 'tab1',
+        path: 'ambilan',
         children: [
           {
             path: '',
             loadChildren: () =>
-              import('../tab1/tab1.module').then(m => m.Tab1PageModule)
+              import('./ambilan/ambilan.module').then(m => m.AmbilanPageModule)
           }
         ]
       },
       {
-        path: 'tab2',
+        path: 'keep',
         children: [
           {
             path: '',
             loadChildren: () =>
-              import('../tab2/tab2.module').then(m => m.Tab2PageModule)
+              import('./keep/keep.module').then(m => m.KeepPageModule)
           }
         ]
       },
       {
-        path: 'tab3',
+        path: 'akun',
         children: [
           {
             path: '',
             loadChildren: () =>
-              import('../tab3/tab3.module').then(m => m.Tab3PageModule)
+              import('./akun/akun.module').then(m => m.AkunPageModule)
           }
         ]
       },
       {
         path: '',
-        redirectTo: '/tabs/tab1',
+        redirectTo: '/tabs/keep',
         pathMatch: 'full'
       }
     ]
   },
   {
     path: '',
-    redirectTo: '/tabs/tab1',
+    redirectTo: '/tabs/keep',
     pathMatch: 'full'
   }
 ];

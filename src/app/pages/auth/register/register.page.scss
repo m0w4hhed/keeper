@@ -1,0 +1,34 @@
+.container {
+    margin: 0;
+    position: absolute;
+    width: 90%;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+.list-md {
+    padding: 0 !important;
+    background: var(--ion-item-background,var(--ion-background-color));
+}
+.reg-form {
+    color: var(--ion-color-primary);
+    text-align: center;
+}
+
+span.preffix {
+    position: absolute;
+    bottom: 8px;
+    left: 12px;
+}
+span.ios.preffix {
+    left: 15px;
+    bottom: 8px;
+}
+ion-input.input-preffix {
+    padding-left: 28px !important;
+}
+ion-label p {
+    font-size: 12px;
+    margin: 5px 0 0;
+}

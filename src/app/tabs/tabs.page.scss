@@ -1,1 +1,17 @@
+ :host {
+    --st-base-color-inactive: rgba(255,255,255,0.4);
+    --st-base-color-active: var(--ion-color-secondary-contrast);
+    --st-icon-color-active: var(--ion-color-secondary-contrast);
+    // --st-indicator-color: var(--ion-color-light);
+}
 
+super-tab-button {
+    height: 57px;
+    --st-icon-size: 20px;
+    --st-label-font-size: 13px;
+    --st-label-text-transform: none;
+    font-family: var(--ion-font-family);
+}
+.tab-label {
+    margin-top: 3px;
+}

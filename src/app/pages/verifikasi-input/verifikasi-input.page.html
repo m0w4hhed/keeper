@@ -1,0 +1,125 @@
+<ion-header>
+  <ion-toolbar color="semidark" mode="ios">
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()" >
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons> 
+    <ion-title>Verifikasi Orderan</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="darker" *ngIf="inputOrder as inv">
+  <ion-item color="darker" lines="none">
+    <p>
+      <span class="title">Invoice</span> <br>
+      <span class="titleName">#{{inv.id}}</span>
+    </p>
+    <p slot="end" style="text-align: right;">
+      <span class="title">Tanggal</span> <br>
+      <span class="titleName">{{(inv.waktuOrder*1000) | date:'dd/MM/yyyy'}}</span>
+    </p>
+  </ion-item>
+  <ion-item color="semidark" lines="none" style="padding: 0 0 10px;border-top: 0.5px solid #444444;">
+    <ion-icon name="contact" color="success"></ion-icon>
+    <p>
+      <span class="titleName">{{inv.penerima.nama.toUpperCase()}} | </span> 
+      +{{inv.penerima.hp}}<br>
+      <span class="note">
+        {{tool.titleCase(inv.penerima.alamat)}},
+        Kec. {{inv.penerima.kec}},&nbsp;
+        Kab. {{inv.penerima.kab}},&nbsp;
+        Prov. {{inv.penerima.prov}}
+      </span>
+    </p>
+  </ion-item>
+  <ion-item color="semidark" lines="none" style="border-top: 0.5px solid #444444;">
+    <p style="margin: 8px 0 10px;">
+      <span class="title">Pengirim</span> <br>
+      <span class="titleName">{{inv.pengirim.nama.toUpperCase()}} | +{{inv.pengirim.hp}}</span> <br>
+      <span class="note"></span>
+    </p>
+  </ion-item>
+  <ion-list style="padding:0">
+    <ion-item color="darker">
+      <ion-label color="success">
+        Barang:
+      </ion-label>
+    </ion-item>
+    <ion-item button *ngFor="let item of inv.pesanan" color="darker">
+      <ion-ripple-effect></ion-ripple-effect>
+      <ion-label style="font-size: 14px;margin:0">
+        <strong> {{tool.titleCase(item.nama)}} </strong> {{tool.titleCase(item.warna)}}
+        <br>
+        <p style="font-size: 10px">
+          {{item.toko.toUpperCase()}} | {{item.berat}} gram
+        </p>
+      </ion-label>
+      <ion-note slot="end" style="font-size: 15px; padding: 14px 0 14px 16px;">Rp.{{item.hargaJual | number}}</ion-note>
+    </ion-item>
+    <ion-item color="darker" lines="full">
+      <ion-label style="font-size: 14px;margin:0;">Kode Unik:</ion-label>
+      <ion-note slot="end" style="font-size: 15px; padding: 14px 0 14px 16px;">Rp.{{inv.kodeUnik | number}}</ion-note>
+    </ion-item>
+    <ion-item color="darker" lines="none">
+      <ion-label style="font-size: 18px;"><strong>Sub Total:</strong></ion-label>
+      <ion-note slot="end" style="color:white;font-size: 18px; padding: 14px 0 14px 16px;"><strong>Rp.{{inv.subtotal | number}}</strong></ion-note>
+    </ion-item>
+    <ion-item button color="darker" lines="none" (click)="isAddDiskon=true">
+      <ion-label style="font-size: 18px;">
+        <strong>Diskon: </strong>
+        <span *ngIf="!isAddDiskon" style="font-size: 11px;color: grey;margin: 0;">(ketuk untuk mengubah)</span>
+      </ion-label>
+      <ion-input *ngIf="isAddDiskon" [(ngModel)]="inv.diskon" type="number" style="color:white;font-size: 18px; text-align: right;"></ion-input>
+      <ion-note *ngIf="!isAddDiskon" slot="end" style="color:white;font-size: 18px; padding: 14px 0 14px 16px;"><strong>Rp.{{inv.diskon | number}}</strong></ion-note>
+    </ion-item>
+    <ion-item button color="darker" lines="none" (click)="isAddDeposit=true">
+      <ion-label style="font-size: 18px;">
+        <strong>Deposit: </strong>
+        <span *ngIf="!isAddDeposit" style="font-size: 11px;color: grey;margin: 0;">(ketuk untuk mengubah)</span>
+      </ion-label>
+      <ion-input *ngIf="isAddDeposit" [(ngModel)]="inv.deposit" type="number" style="color:white;font-size: 18px; text-align: right;"></ion-input>
+      <ion-note *ngIf="!isAddDeposit" slot="end" style="color:white;font-size: 18px; padding: 14px 0 14px 16px;"><strong>Rp.{{inv.deposit | number}}</strong></ion-note>
+    </ion-item>
+  </ion-list>
+  <!-- <div class="center">
+    <ion-card> 
+      <ion-card-header style="--background: white;">
+        <ion-card-title>{{inv.penerima.nama.toUpperCase()}}</ion-card-title>
+        <ion-card-subtitle>
+          <p>
+            {{tool.titleCase(inv.penerima.alamat)}} <br>
+            Kec: {{inv.penerima.kec}}<br>
+            Kab: {{inv.penerima.kab}}<br>
+            Prov: {{inv.penerima.prov}}<br> 
+            Hp: {{inv.penerima.hp}}
+          </p>
+        </ion-card-subtitle>
+        <div style="text-align: right;">
+          <ion-card-subtitle>{{inv.pengirim.nama.toUpperCase()}}</ion-card-subtitle>
+          <ion-card-subtitle>{{inv.pengirim.hp}}</ion-card-subtitle>
+        </div>
+      </ion-card-header>
+      <ion-card-content style="background-color: lightgray; padding: 10px 0 10px;">
+        <ion-list>
+          <ion-item *ngFor="let item of inv.pesanan">
+            <ion-label>
+              {{item.toko.toUpperCase()}} &nbsp; <strong> {{item.nama}} </strong> &nbsp;{{item.warna}}
+              <br>
+              <p>
+                {{item.berat}} gram, &nbsp; Rp {{item.hargaJual}}.000,00
+              </p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+        <ion-item>
+          <ion-label slot="end" style="color: black;">Total: Rp {{inv.total}}000,00</ion-label>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+  </div> -->
+</ion-content>
+
+<ion-footer>
+  <ion-button expand="block" color="success" (click)="verif()" style="margin: 0; height: 40px;">Tambah Orderan</ion-button>
+</ion-footer>

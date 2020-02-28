@@ -1,0 +1,43 @@
+<ion-content color="darker" >
+  <ion-card class="container" style="box-shadow: none;-webkit-box-shadow: none;">
+    <ion-card-header>
+      <ion-card-title style="text-align: center;color: #ede5ff;">
+        <img src="../../../../assets/logo.svg">
+      </ion-card-title>
+      <ion-card-subtitle style="text-align: center;    margin: 0;" *ngIf="userService.user$ | async as user">{{user.email}}</ion-card-subtitle>
+    </ion-card-header>
+  
+    <ion-card-content>
+      <ion-list [formGroup]="regForm" *ngIf="(userService.user$ | async) as user" class="reg-form">
+        <ion-item color="light">
+          <ion-label position="stacked">Nama Online Shop</ion-label>
+          <ion-input formControlName="displayName"></ion-input>
+        </ion-item>
+        <ion-item color="light">
+          <ion-label position="stacked">Username / Kode Keep</ion-label>
+          <ion-input formControlName="username" placeholder="Buat username unik untuk kode keep"></ion-input>
+        </ion-item>
+        <ion-item color="light">
+          <span slot="start" class="preffix">+62&nbsp;</span>
+          <ion-label position="stacked">Nomor WA</ion-label>
+          <ion-input formControlName="hp" type="tel" class="input-preffix"></ion-input>
+        </ion-item>
+        <ion-label *ngIf="regForm.invalid">
+          <p *ngIf="regForm.controls.displayName.errors?.required && (regForm.controls.username.dirty || regForm.controls.username.touched)">Nama wajib diisi</p>
+          <p *ngIf="regForm.controls.username.errors?.required && (regForm.controls.username.dirty || regForm.controls.username.touched)">Username belum diisi</p>
+          <p *ngIf="regForm.controls.username.errors?.minlength && (regForm.controls.username.dirty || regForm.controls.username.touched)">Username minimal 3 huruf/angka</p>
+          <p *ngIf="regForm.controls.username.errors?.maxlength && (regForm.controls.username.dirty || regForm.controls.username.touched)">Username maksimal 15 huruf/angka</p>
+          <p *ngIf="regForm.controls.username.errors?.pattern && (regForm.controls.username.dirty || regForm.controls.username.touched)">Username hanya boleh berupa huruf dan angka</p>
+          <p *ngIf="(regForm.controls.hp.errors?.pattern || regForm.controls.hp.errors?.minlength) || (regForm.controls.hp.errors?.required && (regForm.controls.hp.dirty || regForm.controls.hp.touched))">HP tidak valid</p>
+        </ion-label>
+      </ion-list>
+      <ion-button [disabled]="onreg || regForm.invalid" (click)="register()"
+      expand="full" style="margin:5px 0 0; height: 40px" color="primary"
+      *ngIf="(userService.user$ | async) as user">
+        <ion-icon name="log-in"></ion-icon>&nbsp;
+        <ion-label>DAFTAR MEMBER</ion-label>
+      </ion-button>
+      <br>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

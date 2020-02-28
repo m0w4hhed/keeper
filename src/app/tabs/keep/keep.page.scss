@@ -1,0 +1,84 @@
+mat-panel-title {
+  color: white; // var(--ion-color-primary);
+  margin: 0;
+  text-align: center !important;
+  display: block;
+  font-family: var(--ion-font-family);
+}
+::ng-deep .mat-expansion-panel-body {
+    padding: 0 15px 15px !important;
+}
+ion-item {
+  --highlight-color-focused: transparent;
+  --highlight-color-valid: transparent;
+  --highlight-color-invalid: transparent;
+}
+
+// Input order css
+.header-title {
+  font-size: 20px;
+  margin-top: 3px;
+}
+.input-header {
+  width: 100%;
+}
+.papper {
+  border-radius: 5px;
+  margin: 0;
+  color: black;
+}
+.triangle-back {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-top: 30px solid var(--ion-color-primary);
+  border-left: 30px solid transparent;
+}
+.triangle-folded {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-right: 30px solid transparent;
+}
+.found {
+  border-bottom: 30px solid var(--ion-color-light-shade);
+}
+.not-found { 
+  border-bottom: 30px solid var(--ion-color-warning-shade);
+}
+.thin-list {
+  height: 30px;
+}
+.thin-label {
+  text-align: center;
+  font-size: 13px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  margin: 0 0 5px -17px;
+}
+.text-error {
+  color: white;
+  border-bottom: solid 2px white;
+}
+.text-success {
+  color: var(--ion-color-primary);
+  border-bottom: solid 2px var(--ion-color-primary);
+}
+.list-container {
+  margin-top: 5px;
+  border: solid 1px var(--ion-color-light);
+  border-radius: 5px;
+}
+.thin-list-kec {
+  text-align: center;
+  font-size: 13px;
+  margin: -15px 0 0;
+  color: var(--ion-color-light);
+}
+.checkmark {
+  text-align: center;
+  font-size: 13px;
+  margin: -20px 0 0;
+  color: var(--ion-color-light);
+}

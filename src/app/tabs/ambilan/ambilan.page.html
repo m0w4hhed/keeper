@@ -1,0 +1,14 @@
+<ion-content [fullscreen]="true">
+  <ion-list class="ion-no-padding" *ngFor="let toko of [1,1,1,1,1,1,1,1,1,1]">
+    <ion-item-divider color="primary" sticky>NAMA TOKO</ion-item-divider>
+    <ion-item color="light" *ngFor="let brg of [1,1,1,1]">
+      <ion-label>
+        <p class="text-secondary" style="font-size: 10px;">NAMA CUSTOMER</p>
+        <h4>Baju Dress Mocca</h4>
+      </ion-label>
+      <ion-chip slot="end">
+        STATUS
+      </ion-chip>
+    </ion-item>
+  </ion-list>
+</ion-content>

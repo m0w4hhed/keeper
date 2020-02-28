@@ -1,0 +1,14 @@
+ion-content ion-toolbar {
+  --background: translucent;
+}
+ion-avatar {
+  background-color: var(--ion-color-light);
+  color: var(--ion-color-primary);
+  // font-weight: 700;
+  padding: 8px;
+  font-size: 20px;
+  text-align: center;
+}
+ion-item ion-icon {
+  margin-right: 12px;
+}

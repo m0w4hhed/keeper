@@ -1,0 +1,31 @@
+<ion-content [fullscreen]="true" color="light">
+  <ion-list class="ion-no-padding">
+    <ion-item-divider *ngIf="user" color="secondary" sticky>
+      <ion-avatar color="light" slot="start">
+        <ion-label>{{initial}}</ion-label>
+      </ion-avatar>
+      <ion-label>
+        {{tool.titleCase(user.displayName)}}
+        <p>{{user.hp}}</p>
+      </ion-label>
+      <ion-button [disabled]="!user.activated" slot="end" color="secondary" style="margin:0 10px 0 0;">
+        <ion-label>UBAH PROFIL</ion-label>
+      </ion-button>
+    </ion-item-divider>
+    <ion-item button color="light" lines="full" (click)="switchDarkMode()">
+      <ion-icon color="dark" name="square" slot="start"></ion-icon>
+      <ion-label *ngIf="!darkMode">Mode Gelap</ion-label>
+      <ion-label *ngIf="darkMode">Mode Terang</ion-label>
+      <ion-toggle slot="end" color="primary" [(ngModel)]="darkMode" (ionChange)="switchDarkMode()" mode="ios"></ion-toggle>
+    </ion-item>
+    <ion-item button color="light" lines="full" (click)="logout()">
+      <ion-ripple-effect></ion-ripple-effect>
+      <ion-icon color="dark" name="open" slot="start"></ion-icon>
+      <ion-label>Log Out</ion-label>
+    </ion-item>
+    <!-- <ion-item color="light" *ngFor="let i of [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]">
+      <ion-icon color="primary" name="square"></ion-icon>
+      <ion-label>Setting menu</ion-label>
+    </ion-item> -->
+  </ion-list>
+</ion-content>

@@ -1,0 +1,54 @@
+<ion-content color="light" scroll="false">
+
+  <ion-list color="primary" class="ion-no-padding">
+    <ion-item-group color="primary">
+
+      <ion-item button color="light" line="full" *ngFor="let x of [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]">
+        <ion-ripple-effect></ion-ripple-effect>
+        <ion-label>
+          <h4><b>Pemesan </b><span class="text-secondary"><span class="dot"></span> +628111222333</span></h4>
+          <p class="text-secondary">1x Kirana Dress, +3 Produk</p>
+          <ion-badge>Rp. 570,000</ion-badge>
+        </ion-label>
+      </ion-item>
+
+    </ion-item-group>
+  </ion-list>
+</ion-content>
+
+<ion-footer *ngIf="userService.user$ | async">
+  <mat-accordion class="input-header">
+    <mat-expansion-panel [expanded]="expand" hideToggle style="background-color: var(--ion-color-primary);border-radius: 0;">
+      <mat-expansion-panel-header [collapsedHeight]="'40px'" [expandedHeight]="'40px'" style="background-color: var(--ion-color-primary);">
+        <mat-panel-title>
+          <ion-icon name="add"></ion-icon>&nbsp;
+          <strong>INPUT ORDERAN BARU</strong>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <ion-item [color]="(error && input)?'warning':'light'" class="papper">
+        <div class="triangle-back"></div>
+        <div [class]="(error && input)?'triangle-folded not-found':'triangle-folded found'"></div>
+        <ion-textarea style="margin-bottom: 20px;" placeholder="Paste format order disini..." rows="7" autoGrow="true" [(ngModel)]="input" (ngModelChange)="baca(input)"></ion-textarea >
+        <div [class]="error?'thin-label text-error':'thin-label text-success'" *ngIf="input?.length>0" >
+          <span *ngIf="error">{{error}}</span>
+          <span *ngIf="!error && inputOrder">Pilih Kecamatan:</span>
+        </div>
+      </ion-item>
+      <ion-list class="ion-no-padding list-container" *ngIf="input?.length>0 && inputOrder && !error">
+        <ion-item button *ngFor="let kec of listKecamatan" color="primary"
+        class="thin-list" (click)="pilih(kec)" lines="full">
+          <ion-ripple-effect></ion-ripple-effect>
+          <ion-label class="thin-list-kec" style="margin-bottom: 5px;">
+            <strong>{{kec.subdistrict_name}}</strong>, {{kec.city}}, {{kec.province}}
+          </ion-label>
+          <ion-icon class="checkmark" name="checkmark" *ngIf="kec===kecamatan"></ion-icon>
+        </ion-item>
+      </ion-list>
+      <ion-button expand="block" fill="solid" color="light" [disabled]="!kecamatan || error"
+      (click)="submit(inputOrder)" style="margin: 5px 0 0;color:var(--ion-color-light);height: 32px;">
+        <ion-icon slot="start" name="add"></ion-icon>
+        TAMBAH
+      </ion-button>
+    </mat-expansion-panel>
+  </mat-accordion>
+</ion-footer>
