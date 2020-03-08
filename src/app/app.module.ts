@@ -28,9 +28,11 @@ import { GraphQLModule } from './modules/graphql.module';
 import { ApolloModule } from 'apollo-angular';
 import { SuperTabsModule } from '@ionic-super-tabs/angular';
 import { HttpClientModule } from '@angular/common/http';
-import { isLoggedIn } from './pages/auth/guard/auth.guard';
+import { AuthGuard } from './pages/auth/guard/auth.guard';
 import { IonicStorageModule } from '@ionic/storage';
 import { FormsModule } from '@angular/forms';
+import { EditInvoicePageModule } from './pages/edit-invoice/edit-invoice.module';
+import { EditModalPageModule } from './pages/modals/edit-modal/edit-modal.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -47,10 +49,12 @@ import { FormsModule } from '@angular/forms';
     RegisterPageModule,
     VerifikasiInputPageModule,
     WelcomePageModule,
+    EditInvoicePageModule,
+    EditModalPageModule,
     // Angularfire Modules
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
-    AngularFirestoreModule,
+    AngularFirestoreModule.enablePersistence(),
     // Custom Modules
     ApolloModule,
     GraphQLModule,
@@ -61,7 +65,7 @@ import { FormsModule } from '@angular/forms';
     SplashScreen,
     GooglePlus,
     InAppBrowser,
-    isLoggedIn,
+    AuthGuard,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

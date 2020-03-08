@@ -1,0 +1,18 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>{{title}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<div class="inner-content">
+  <ion-list class="ion-no-padding">
+    <ion-item lines="full" *ngFor="let d of data">
+      <ion-label>{{tool.titleCase(d.key)}}:</ion-label>
+      <ion-input *ngIf="d.type !== 'textarea'" [type]="d.type" [(ngModel)]="d.value"></ion-input>
+      <ion-textarea autoGrow *ngIf="d.type === 'textarea'" [(ngModel)]="d.value"></ion-textarea>
+    </ion-item>
+  </ion-list>
+  <ion-button (click)="dismiss(data)" style="margin:0" expand="full" color="primary">
+    SIMPAN
+  </ion-button>
+</div>

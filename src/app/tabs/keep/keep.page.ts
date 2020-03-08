@@ -1,13 +1,16 @@
 import { Component } from '@angular/core';
 import { Invoice } from 'src/app/services/interfaces/invoice';
 import { Kecamatan } from 'src/app/services/interfaces/ongkir';
-import { User, UserService } from 'src/app/services/user.service';
+import { UserService } from 'src/app/services/user.service';
 import { DataService } from 'src/app/services/data.service';
 import { ToolService } from 'src/app/services/tool.service';
 import { EkspedisiService } from 'src/app/services/ekspedisi.service';
-import { ModalController } from '@ionic/angular';
+import { ModalController, Platform } from '@ionic/angular';
 import { StorageService } from 'src/app/services/storage.service';
 import { VerifikasiInputPage } from 'src/app/pages/verifikasi-input/verifikasi-input.page';
+import { User } from 'src/app/services/interfaces/user.config';
+import { EditInvoicePage } from 'src/app/pages/edit-invoice/edit-invoice.page';
+import { SwitcherService } from 'src/app/services/switcher.service';
 
 @Component({
   selector: 'app-keep',
@@ -16,7 +19,8 @@ import { VerifikasiInputPage } from 'src/app/pages/verifikasi-input/verifikasi-i
 })
 export class KeepPage {
 
-  invoices: Invoice[]; task2;
+  onload = true;
+  // invoices;
 
   expand = false;
 
@@ -25,35 +29,33 @@ export class KeepPage {
   listKecamatan: Kecamatan[];
   kecamatan: Kecamatan;
 
-  user: User; task;
-  olshopInfo;
-
   constructor(
     public userService: UserService,
-    private dataService: DataService,
-    private tool: ToolService,
+    public switcher: SwitcherService,
+    private plt: Platform,
+    public tool: ToolService,
     private ekspedisi: EkspedisiService,
     private modalCtrl: ModalController,
-    private storage: StorageService,
-    ) {
-      this.dataService.c();
-      // this.plt.ready().then(() => this.loadKontak());
-      this.task = this.userService.user$.subscribe(user => {
-        this.user = user;
-      });
-      // this.task2 = this.storage.getInvoice().subscribe(res => {this.invoices = res; console.log(res); })
-    }
+  ) {
+    // this.dataService.c();
+    // this.plt.ready().then(() => this.invoices = this.switcher.getInvoice());
+  }
+
+  async openInvoice(invoice: Invoice, user: User) {
+    const modal = await this.modalCtrl.create({
+      component: EditInvoicePage,
+      componentProps: { id: invoice.id, user }
+    });
+    modal.present();
+  }
 
   baca(input: string) {
     if (input) {
       if (input === '') {
         this.inputOrder = {} as Invoice;
       } else {
-        // console.log('[RESULT]: ', result);
         const result = this.tool.baca(input);
         if (result.error) {
-          // this.popup.showAlert('ERROR', result.error);
-          // console.log(result.error);
           this.error = result.error;
         } else {
           this.error = null;
@@ -72,33 +74,27 @@ export class KeepPage {
     this.kecamatan = kec;
     this.inputOrder.penerima.kec_id = kec.subdistrict_id;
     this.inputOrder.penerima.kab = kec.city;
+    this.inputOrder.penerima.kab_id = kec.city_id;
     this.inputOrder.penerima.prov = kec.province;
+    this.inputOrder.penerima.prov_id = kec.province_id;
   }
-  async submit(inputOrder: Invoice) {
+  async submit(inputOrder: Invoice, user: User) {
     console.log(inputOrder);
-    inputOrder.owner_id = this.user.uid;
-    inputOrder.cs = this.user.username;
+    inputOrder.owner = user.uid;
+    inputOrder.cs = user.username;
     if (!inputOrder.pengirim.nama) {
-      inputOrder.pengirim.nama = this.user.displayName.toLowerCase();
-      inputOrder.pengirim.hp = this.user.hp;
+      inputOrder.pengirim.nama = user.displayName.toLowerCase();
+      inputOrder.pengirim.hp = user.hp;
     }
-    inputOrder.pesanan = inputOrder.pesanan.map(({owner_id, cs, ...barang}) => ({
+    inputOrder.pesanan = inputOrder.pesanan.map(({owner, cs, ...barang}) => ({
       ...barang,
-      owner_id: this.user.uid,
-      cs: this.user.username,
+      owner: user.uid,
+      cs: user.username,
     }))
-    // inputOrder.id = inv.id;
-    // inputOrder.berat = inv.berat;
-    // inputOrder.cs = this.user.username;
-    // inputOrder.penerima = inv.penerima;
-    // inputOrder.pengirim = inv.pengirim;
-    // inputOrder.pesanan = inv.pesanan;
-    // inputOrder.subtotal = inv.total;
-    // inputOrder.kodeUnik = inv.kodeUnik;
     const modalCtrl = await this.modalCtrl.create({
       component: VerifikasiInputPage,
       componentProps: {
-        inputOrder
+        inputOrder, user
       }
     });
     this.input = null;

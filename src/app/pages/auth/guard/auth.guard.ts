@@ -1,44 +1,46 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { take, map } from 'rxjs/operators';
+import { CanActivate, Router, ActivatedRouteSnapshot } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { UserService } from '../../../services/user.service';
 
 @Injectable({
     providedIn: 'root'
 })
-export class isLoggedIn implements CanActivate {
+export class AuthGuard implements CanActivate {
     constructor(
       private userService: UserService,
       private router: Router
     ) { }
-
-    canActivate(next, state): Observable<boolean> {
-      return this.userService.user$.pipe(
-        take(1),
-        map(user => {
-          if (user) {
-            console.log('[USR] Sudah Login');
-            return true;
-          } else {
-            console.log('[USR] Belum Login');
+    
+    canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
+      return this.userService.auth().pipe(
+        switchMap(user => {
+          if (user) { return of(true); }
+          else {
             this.router.navigate(['/welcome']);
-            return false;
+            return of(false);
           }
         })
-      );
+      )
     }
-    // canActivate(route: ActivatedRouteSnapshot): Promise<boolean> {
-    //   return new Promise((resolve, reject) => {
-    //     firebase.auth().onAuthStateChanged(user => {
-    //       if (user) {
+    // canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
+    //   firebase.auth().onAuthStateChanged(user => {
+    //     if (user) {
+    //       console.log('[USR.G] Sudah Login');
+    //       const userData = this.userService.getUserData(user.uid);
+    //       if (userData.configured) {
+    //         console.log('[USR.G] Sudah Registrasi');
     //         resolve(true);
     //       } else {
+    //         console.log('[USR.G] Belum Registrasi');
+    //         this.router.navigate(['/register']);
     //         resolve(false);
-    //         this.popup.showToast('Anda harus login dulu', 700);
-    //         this.saveRouteTo('/login');
     //       }
-    //     });
+    //     } else {
+    //       this.router.navigate(['/welcome']);
+    //       resolve(false);
+    //     }
     //   });
     // }
   
@@ -48,26 +50,3 @@ export class isLoggedIn implements CanActivate {
     //   });
     // }
 }
-
-// @Injectable({
-//     providedIn: 'root'
-// })
-// export class isActivated implements CanActivate {
-//     constructor(private userService: UserService, private router: Router) { }
-
-//     canActivate(next, state): Observable<boolean> {
-//       return this.userService.user$.pipe(
-//         take(1),
-//         map(user => {
-//           if (user.activated) { 
-//             console.log('[USR] User aktif');
-//             return true;
-//           } else {
-//             console.log('[USR] User belum aktif');
-//             this.router.navigate(['/activate']);
-//             return false;
-//           }
-//         })
-//       );
-//     }
-// }

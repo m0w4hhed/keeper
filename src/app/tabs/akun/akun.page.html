@@ -8,7 +8,7 @@
         {{tool.titleCase(user.displayName)}}
         <p>{{user.hp}}</p>
       </ion-label>
-      <ion-button [disabled]="!user.activated" slot="end" color="secondary" style="margin:0 10px 0 0;">
+      <ion-button [disabled]="!user.configured" (click)="editProfil()" slot="end" color="secondary" style="margin:0 10px 0 0;">
         <ion-label>UBAH PROFIL</ion-label>
       </ion-button>
     </ion-item-divider>

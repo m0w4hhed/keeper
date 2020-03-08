@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { UserService, User } from './user.service';
-import { Observable } from 'rxjs';
-import { UserConfig } from './interfaces/user.config';
+import { User } from './interfaces/user.config';
 import { Invoice, Ambilan } from './interfaces/invoice';
 
 @Injectable({
@@ -10,105 +8,120 @@ import { Invoice, Ambilan } from './interfaces/invoice';
 })
 export class DataService {
 
-  user: User; task;
-
-  userConfig: Observable<UserConfig>;
-  // sharedConfig: Observable<SharedConfig>;
-
   constructor(
     private afs: AngularFirestore,
-    private userService: UserService,
   ) {
-    this.task = this.userService.user$.subscribe(res => {
-      console.log('[DATA] Get User Data');
-      this.user = res
-    });
-    this.getConfigs();
-  }
-  getConfigs() {
-    console.log('[DATA] Observe User Config');
-    this.userConfig = this.afs.doc<UserConfig>(`configs/user_config`).valueChanges();
-    // this.sharedConfig = this.afs.doc<SharedConfig>(`configs/user_config_share`).valueChanges();
+    // this.c().then(() => console.log('TOKO CREATED'));
   }
 
-  c() { //sampe sini buat list toko
-    const dataToko = [
-      {kode: 'LTS', nama : 'SHOFIYA'},
-      {kode: 'KANZA', nama : 'KANZA'},
-      {kode: 'ALILA', nama : 'ALILA'},
-      {kode: 'ALILA 2', nama : 'ALILA 2'},
-      {kode: 'AKIFA', nama : 'AKIFA'},
-      {kode: 'HH', nama : 'HIJAB HUBBY'},
-      {kode: 'ELLORA', nama : 'ELLORA'},
-      {kode: 'MARITZA', nama : 'MARITZA'},
-      {kode: 'UWAIS', nama : 'UWAIS'},
-      {kode: 'BM', nama : 'BELANJA MURAH'},
-      {kode: 'JELITA', nama : 'JELITA'},
-      {kode: 'RASEPI', nama : 'RASEPI'},
-      {kode: 'SVJ', nama : 'SVJ BATIK'},
-      {kode: 'BA', nama : 'BUTIK ASHANTY'},
-      {kode: 'CLA', nama : 'CLA HIJAB'},
-      {kode: 'INTANAKA', nama : 'INTANAKA'},
-      {kode: 'YUSHA', nama : 'YUSHA ILYASA'},
-      {kode: 'ORINAWA', nama : 'ORINAWA'},
-      {kode: 'ORINAURA', nama : 'ORINAURA'},
-      {kode: 'ASTA BAG', nama : 'ASTA BAG'},
-      {kode: 'ASTA KC', nama : 'ASTA KACAMATA'},
-      {kode: 'REDEA', nama : 'REDEA HIJAB'},
-      {kode: 'ZARRA', nama : 'ZARRA'},
-      {kode: 'NAJWA', nama : 'NAJWA HIJAB'},
-      {kode: 'VANILLA', nama : 'VANILLA'},
-      {kode: 'ADORE', nama : 'ADORE'},
-      {kode: 'EDELWEIS', nama : 'EDELWEISS'},
-      {kode: 'SPASSY', nama : 'SPASSY'},
-      {kode: 'PANDA', nama : 'PANDA JAKET'},
-      {kode: 'UNIQUE', nama : 'UNIQUE'},
-      {kode: 'SANCAKA', nama : 'SANCAKA'},
-      {kode: 'DOD', nama : 'DOD SHOP'},
-      {kode: 'JUANA', nama : 'JUANA'},
-      {kode: 'EPIE', nama : 'EPIE'}
-    ];
-    this.afs.collection('configs').doc('user_config_share').set({data_toko: dataToko})
-  }
+  // c() { //sampe sini buat list toko
+  //   const dataToko = [
+  //     {kode: 'denora', nama : 'denora'},
+  //     {kode: 'beauty', nama : 'beauty'},
+  //     {kode: 'mpmf', nama : 'mpmf'},
+  //     {kode: 'fuchia', nama : 'fuchia'},
+  //     {kode: 'maritza', nama : 'maritza'},
+  //     {kode: 'jelita', nama : 'jelita'},
+  //     {kode: 'alila', nama : 'alila'},
+  //     {kode: 'alila2', nama : 'alila 2'},
+  //     {kode: 'lts', nama : 'lts shofiya'},
+  //     {kode: 'shofiyah', nama : 'shofiyah miraa'},
+  //     {kode: 'qilla', nama : 'qilla'},
+  //     {kode: 'kanza', nama : 'kanza'},
+  //     {kode: 'alfa', nama : 'alfa'},
+  //     {kode: 'unique', nama : 'unique'},
+  //     {kode: 'afka', nama : 'afka'},
+  //     {kode: 'ama', nama : 'ama najwa'},
+  //     {kode: 'ama2', nama : 'ama najwa 2'},
+  //     {kode: 'foyou', nama : 'foyou'},
+  //     {kode: 'dj', nama : 'dj fashion'},
+  //     {kode: 'anisa', nama : 'anisa'},
+  //     {kode: 'abella', nama : 'abella'},
+  //     {kode: 'billal', nama : 'billal'},
+  //     {kode: 'sf', nama : 'shofiyah fashion'},
+  //     {kode: 'aderra', nama : 'aderra'},
+  //     {kode: 'fc', nama : 'f collection'},
+  //     {kode: 'olive', nama : 'olive shoes'},
+  //     {kode: 'nabtik', nama : 'nabtik'},
+  //     {kode: 'uwais', nama : 'uwais hijab'},
+  //     {kode: 'shafeea', nama : 'shafeea hijab'},
+  //     {kode: 'sisters', nama : `sister's hijab`},
+  //     {kode: 'spassy', nama : 'spassy'},
+  //     {kode: 'en', nama : 'en hijab'},
+  //     {kode: 'shafara', nama : 'shafara oval hijab luvis'},
+  //     {kode: 'akifa', nama : 'akifa'},
+  //     {kode: 'hh', nama : 'hijab hubby'},
+  //     {kode: 'ellora', nama : 'ellora'},
+  //     {kode: 'bm', nama : 'belanja murah'},
+  //     {kode: 'rasepi', nama : 'rasepi'},
+  //     {kode: 'svj', nama : 'svj batik'},
+  //     {kode: 'ba', nama : 'butik ashanty'},
+  //     {kode: 'cla', nama : 'cla hijab'},
+  //     {kode: 'intanaka', nama : 'intanaka'},
+  //     {kode: 'yusha', nama : 'yusha ilyasa'},
+  //     {kode: 'orinawa', nama : 'orinawa'},
+  //     {kode: 'orinaura', nama : 'orinaura'},
+  //     {kode: 'asta bag', nama : 'asta bag'},
+  //     {kode: 'asta kc', nama : 'asta kacamata'},
+  //     {kode: 'redea', nama : 'redea hijab'},
+  //     {kode: 'zarra', nama : 'zarra'},
+  //     {kode: 'najwa', nama : 'najwa hijab'},
+  //     {kode: 'vanilla', nama : 'vanilla'},
+  //     {kode: 'adore', nama : 'adore'},
+  //     {kode: 'edelweis', nama : 'edelweiss'},
+  //     {kode: 'panda', nama : 'panda jaket'},
+  //     {kode: 'sancaka', nama : 'sancaka'},
+  //     {kode: 'dod', nama : 'dod shop'},
+  //     {kode: 'juana', nama : 'juana'},
+  //     {kode: 'epie', nama : 'epie'}
+  //   ];
+  //   this.afs.collection('configs').doc('user_config').update({data_toko: dataToko.map(d => ({...d, blacklist: false}))});
+  //   const batch = this.afs.firestore.batch();
+  //   dataToko.forEach(toko => {
+  //     const refToko = this.afs.collection('configs').doc('user_config').collection('data_toko').doc(toko.kode).ref;
+  //     batch.set(refToko, { nama: toko.nama, lantai: 0, blok: '', hpKeep: 0, hpDaftar: 0, foto: '', jual: [], active: true });
+  //   });
+  //   return batch.commit();
+  // }
 
-  async createInvoice(inv: Invoice) {
+  async createInvoice(user: User, inv: Invoice) {
     // console.log(inv);
     try {
       const batch = this.afs.firestore.batch();
       const keepRef = this.afs.collection('invoice').doc<Invoice>(inv.id).ref;
       batch.set(keepRef, {
         active: true,
-        owner_id  : this.user.uid,
+        owner: user.uid,
         id: inv.id,
         berat: inv.berat,
-        cs: this.user.username,
+        cs: user.username,
         penerima: inv.penerima,
         pengirim: inv.pengirim,
-        pesanan: inv.pesanan,
+        pesanan: inv.pesanan.map(brg => ({barcode: brg.barcode})),
         status: 'keep',
-        subtotal: inv.total,
         waktuOrder: inv.pesanan[0].waktuKeep,
-        kodeUnik: inv.kodeUnik,
         diskon: 0,
         dicek: false,
+        // subtotal: inv.total,
+        // kodeUnik: inv.kodeUnik,
         // deposit: 0;
-        // ekspedisi: Ekspedisi;
         // tglDibayar: 0,
         // waktuDibayar: number;
         // waktuDicek: number;
+        // ekspedisi: Ekspedisi;
       });
       for (const item of inv.pesanan) {
         const ambilanRef = this.afs.collection('ambilan').doc<Ambilan>(item.barcode).ref;
         batch.set(ambilanRef, {
           barcode: item.barcode,
-          barang: item.nama,         // nama
+          nama: item.nama,         // nama
           toko: item.toko,
           warna: item.warna,
           hargaBeli: item.hargaBeli,
           waktuKeep: item.waktuKeep,
+          waktuPrint: 0,
           penerima: inv.penerima.nama,
           printed: false,
-          tglPrint: 0,
           statusKeep: item.statusKeep         // (fullkeep/diambil/kosong)
           // cs: string;
           // pj: string;             // gudang
@@ -119,10 +132,6 @@ export class DataService {
     } catch (err) {
       throw err;
     }
-  }
-
-  onDestroy() {
-    this.task.unsubscribe();
   }
 
 }

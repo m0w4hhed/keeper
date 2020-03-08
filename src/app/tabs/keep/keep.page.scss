@@ -13,6 +13,11 @@ ion-item {
   --highlight-color-valid: transparent;
   --highlight-color-invalid: transparent;
 }
+ion-badge {
+  border-radius: 15px;
+  padding: 4px 8px 5px;
+  margin-top: 5px;
+}
 
 // Input order css
 .header-title {

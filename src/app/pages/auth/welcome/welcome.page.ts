@@ -3,6 +3,7 @@ import { IonSlides, LoadingController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { PopupService } from 'src/app/services/popup.service';
 import { UserService } from 'src/app/services/user.service';
+import * as firebase from 'firebase';
 
 @Component({
   selector: 'app-welcome',
@@ -24,17 +25,12 @@ export class WelcomePage {
     private popup: PopupService,
     private userService: UserService,
   ) {
-    this.task = this.userService.user$.subscribe(user => {
+    firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        if (user.configured) {
-          console.log('[USR] Sudah registrasi');
-          this.router.navigate(['/']);
-        } else {
-          this.router.navigate(['/register']);
-        }
-        this.oncheck = false;
+        console.log('[USR.W] Sudah Login');
+        this.router.navigate(['/']);
       } else {
-        this.oncheck = false;
+        console.log('[USR.W] Belum Login');
       }
     });
   }
@@ -62,6 +58,7 @@ export class WelcomePage {
       () => {
         console.log('[LOGIN] Sukses')
         this.onlogin = false;
+        this.router.navigate(['/'])
         loading.dismiss();
       },
       (err) => {

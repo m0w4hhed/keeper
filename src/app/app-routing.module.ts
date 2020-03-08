@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { isLoggedIn } from './pages/auth/guard/auth.guard';
+import { AuthGuard } from './pages/auth/guard/auth.guard';
 
 const routes: Routes = [
   {
     path: '',
     loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule),
-    canActivate: [isLoggedIn]
+    canActivate: [AuthGuard]
   },
   {
     path: 'register',
@@ -14,12 +14,22 @@ const routes: Routes = [
   },
   {
     path: 'welcome',
-    loadChildren: () => import('./pages/auth/welcome/welcome.module').then( m => m.WelcomePageModule)
+    loadChildren: () => import('./pages/auth/welcome/welcome.module').then( m => m.WelcomePageModule),
+    // canActivate: [AuthGuard],
+    // data: { isLoggedIn: false, isConfigured: false }
   },
   {
     path: 'verifikasi-input',
     loadChildren: () => import('./pages/verifikasi-input/verifikasi-input.module').then( m => m.VerifikasiInputPageModule),
-    canActivate: [isLoggedIn]
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'edit-invoice',
+    loadChildren: () => import('./pages/edit-invoice/edit-invoice.module').then( m => m.EditInvoicePageModule)
+  },
+  {
+    path: 'edit-modal',
+    loadChildren: () => import('./pages/modals/edit-modal/edit-modal.module').then( m => m.EditModalPageModule)
   }
 ];
 @NgModule({

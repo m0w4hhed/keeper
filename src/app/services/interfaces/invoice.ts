@@ -1,6 +1,6 @@
 export interface Invoice {
     active: boolean;         // default: true
-    owner_id: string;
+    owner: string;
     id: string;
     kodeUnik: number;
     berat: number;          // gram
@@ -14,7 +14,6 @@ export interface Invoice {
     pengirim: Pengirim;
     pesanan: Ambilan[];
     status: string;         // keep, dibayar, dikirim
-    tglDibayar: number;
     subtotal: number;
     total: number;
     waktuDibayar: number;
@@ -24,7 +23,7 @@ export interface Invoice {
     printed: boolean;
 }
 export interface Ambilan {
-    owner_id: string;
+    owner: string;
     barcode: string;
     nama: string;        // nama
     warna: string;
@@ -35,11 +34,11 @@ export interface Ambilan {
     waktuKeep: number;
     penerima: string;
     toko: string;
-    pj: string;            // keeperboy
+    pj: string;            // kode abang keeper
     statusKeep: string;    // (fullkeep/diambil/kosong)
-    waktuScan: number;
+    waktuDiambil: number;   // unix timestamp
+    waktuPrint: number;     // unix timestamp
     printed: boolean;
-    tglPrint: number;      // YYYYMMDD
 }
 export interface Pengirim {
     hp: number;
@@ -49,10 +48,12 @@ export interface Penerima {
     alamat: string;
     hp: number;
     kab: string;
+    kab_id: string;
     kec: string;
     kec_id: string;
     nama: string;
     prov: string;
+    prov_id: string;
 }
 export interface Ekspedisi {
     kurir: string;

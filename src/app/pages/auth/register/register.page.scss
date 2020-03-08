@@ -13,7 +13,6 @@
 }
 .reg-form {
     color: var(--ion-color-primary);
-    text-align: center;
 }
 
 span.preffix {
@@ -31,4 +30,9 @@ ion-input.input-preffix {
 ion-label p {
     font-size: 12px;
     margin: 5px 0 0;
+    text-align: center;
+}
+ion-note p {
+    margin: 10px 15px 0;
+    font-size: 10px;
 }

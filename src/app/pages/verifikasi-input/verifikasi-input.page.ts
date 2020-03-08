@@ -8,6 +8,8 @@ import { UserService } from 'src/app/services/user.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { Invoice } from 'src/app/services/interfaces/invoice';
 import { Kecamatan } from 'src/app/services/interfaces/ongkir';
+import { User } from 'src/app/services/interfaces/user.config';
+import { SwitcherService } from 'src/app/services/switcher.service';
 
 @Component({
   selector: 'app-verifikasi-input',
@@ -22,15 +24,14 @@ export class VerifikasiInputPage implements OnInit {
 
   inputOrder: Invoice;
   kecamatan: Kecamatan[];
+  user: User;
 
   constructor(
     private modalC2: ModalController,
     public tool: ToolService,
     public userService: UserService,
-    private ekspedisi: EkspedisiService,
-    private data: DataService,
     private popup: PopupService,
-    private storage: StorageService,
+    private switcher: SwitcherService
   ) { }
 
   ngOnInit() {
@@ -41,7 +42,9 @@ export class VerifikasiInputPage implements OnInit {
   }
 
   verif() {
-    this.storage.createInvoice(this.inputOrder).then(
+    let create = null;
+    this.user.activated ? create = this.switcher.createInvoice(this.user, this.inputOrder) : create = this.switcher.createInvoice(this.user, this.inputOrder);
+    create.then(
       () => { this.popup.showToast('Input Invoice Sukses', 1000); },
       (err) => { this.popup.showAlert('ERROR', err); }
     );

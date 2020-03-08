@@ -39,7 +39,6 @@ export class ToolService {
   ];
 
   constructor(
-    private dataService: DataService,
   ) {}
 
   getTime(format?: string) {
@@ -139,37 +138,39 @@ export class ToolService {
       // console.log(lis)
       lis.forEach((data, i) => {
         const datas = data.split(',');
+        // nama, warna, toko, hargaBeli, jumlah
         if (datas.length === 5) {
-          // console.log(datas[4].replace(/[^0-9]/g, ''));
+          const toko = datas[2].trim();
+          
           const jumlah = +datas[4].replace(/[^0-9]/g, '');
           for (let x = 1; x <= jumlah; x++) {
             const ambilan: Ambilan = {
-              owner_id: null,
+              owner: null,
               cs: null,
               pj: '',
-              waktuScan: 0,
-              tglPrint: 0,
+              waktuDiambil: 0,
+              waktuPrint: 0,
               printed: false,
               barcode : inv.id + '-' + this.uid(2, {alphabetMode: true, mixResult: true}),
-              berat: this.hitungBerat(datas[1]),
+              berat: this.hitungBerat(datas[0]),
               penerima: penerima.nama,
-              hargaBeli: this.hitungHargaBeli(+datas[3].replace(/[^0-9]/g, '')) * 1000,
-              hargaJual: +datas[3].replace(/[^0-9]/g, '') * 1000,
-              nama: datas[1].trim(),
-              toko: datas[0].trim(),
-              warna: datas[2].trim(),
+              hargaBeli: +datas[3].replace(/[^0-9]/g, '') * 1000,
+              hargaJual: null,
+              nama: datas[0].trim(),
+              toko: datas[2].trim(),
+              warna: datas[1].trim(),
               statusKeep: 'keep',
               waktuKeep: inv.waktuOrder
             };
-            inv.subtotal += ambilan.hargaJual;
+            // inv.subtotal += ambilan.hargaJual;
             inv.berat += ambilan.berat;
+            console.log(ambilan);
             listAmbilan.push(ambilan);
           }
         } else {
           ercode = `1.${i + 1}`;
         }
       });
-      inv.subtotal += inv.kodeUnik;
       inv.pesanan = listAmbilan;
     } else {
       ercode = '0.0';
@@ -181,11 +182,11 @@ export class ToolService {
     //   result = { error: 'maaf, id dropshiper tidak ditemukan'};
     // } else
     if ( error[0] === '0' ) {
-      result = { error: 'Maaf, format input order salah!' }
+      result = { error: 'Format input order salah!' }
     } else if ( error[0] === '1' ) {
-      result = { error: `Maaf, format keep barang no.${error[1]} salah!`};
+      result = { error: `Format keep barang no.${error[1]} salah!`};
     } else if ( error[0] === '2' ) {
-        result = { error: `Maaf, format ${error[1]} penerima salah!`};
+        result = { error: `Format ${error[1]} penerima salah!`};
     } else {
       result = { data: inv};
     }

@@ -1,24 +1,17 @@
 import { Injectable, NgZone } from '@angular/core';
-import { ActivatedRouteSnapshot, Router, CanActivate } from '@angular/router';
+import { Router } from '@angular/router';
 import * as firebase from 'firebase';
-import { PopupService } from './popup.service';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Observable, of } from 'rxjs';
 import { GooglePlus } from '@ionic-native/google-plus/ngx';
 import { switchMap, take, map, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-
-export interface User {
-  uid: string;
-  email: string;
-  displayName: string;
-  photoURL: string;
-  username: string;
-  hp: number;
-  configured: boolean;
-  activated: boolean;
-}
+import { GraphqlService } from './graphql.service';
+import { PopupService } from './popup.service';
+import { User, UserConfig } from './interfaces/user.config';
+import { TelegramService } from './tele.service';
+import { ToolService } from './tool.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,19 +22,29 @@ export class UserService {
 
   constructor(
     private afAuth: AngularFireAuth,
-    private http: HttpClient,
+    private gql: GraphqlService,
     private google: GooglePlus,
     private router: Router,
-    private afs: AngularFirestore
+    private afs: AngularFirestore,
+    private tele: TelegramService,
+    private tool: ToolService,
     ) {
-      this.user$ = this.afAuth.authState.pipe(
-        switchMap(user => {
-          if (user) {
-            return this.afs.doc<User>(`users/${user.uid}`).valueChanges();
-          } else { return of(null); }
-        })
-      );
+      this.user$ = this.auth();
     }
+
+  auth(): Observable<User> {
+    return this.afAuth.authState.pipe(
+      switchMap(user => user ? this.getUserData(user.uid) : of({} as User))
+    );
+  }
+  getUserData(uid: string): Observable<User> {
+    console.log('[*GET*] USER DATA UPDATED');
+    return this.afs.doc<User>(`users/${uid}`).valueChanges();
+  }
+  async getConfigs(): Promise<UserConfig> {
+    return (await this.afs.doc<UserConfig>(`configs/user_config`).ref.get()).data() as UserConfig;
+    // this.sharedConfig = this.afs.doc<SharedConfig>(`configs/user_config_share`).valueChanges();
+  }
 
   async loginWithGoogle() {
     try {
@@ -57,50 +60,63 @@ export class UserService {
       firebase.auth.GoogleAuthProvider.credential(idToken);
       const userCredential = await this.afAuth.auth.signInWithCredential(credential);
       if (userCredential.user) {
-        return this.updateUserData(userCredential.user);
+        return this.registerUser(userCredential.user);
       }
     } catch (err) { throw err; }
   }
   async login() {
     try {
-      this.afAuth.auth.signInWithEmailAndPassword('coba@coba.com', 'cobacoba');
+      const userCredential = await this.afAuth.auth.signInWithEmailAndPassword('coba@coba.com', 'cobacoba');
+      if (userCredential.user) {
+        return this.registerUser(userCredential.user);
+      }
     } catch (err) { throw err; }
   }
-  updateUserData({ uid, email, displayName, photoURL}: firebase.User) {
-    const userRef: AngularFirestoreDocument = this.afs.doc(`users/${uid}`);
-    const data = { uid, email, displayName, photoURL };
-    return userRef.set(data, {merge: true});
-  }
-  updateUser(user: User, opt?: {newUser: boolean}) {
-    if (opt) {
-      if (opt.newUser) {
-        console.log('[UPDATE USER] New User');
-        const batch = this.afs.firestore.batch();
-        const userRef = this.afs.doc(`users/${user.uid}`).ref;
-        const usernameRef = this.afs.doc(`username/${user.username}`).ref;
-        batch.update(userRef, user);
-        batch.set(usernameRef, { owner: user.uid });
-        return batch.commit();
+  async registerUser({ uid, email, displayName, photoURL}: firebase.User) {
+    try {
+      const userRef: AngularFirestoreDocument = this.afs.doc(`users/${uid}`);
+      const registered = (await userRef.ref.get()).exists;
+      if (!registered) {
+        const data = { uid, email, displayName, photoURL, activated: false, deposit: 0 };
+        return userRef.set(data);
       }
-    } else {
-      console.log('[UPDATE USER] Configured User');
-      return this.afs.doc(`users/${user.uid}`).update(user);
+    } catch (err) { throw err; }
+  }
+  async updateUser(user: User, opt?: {newUser: boolean}) {
+    try {
+      if (opt) {
+        if (opt.newUser) {
+          console.log('[UPDATE USER] New User');
+          const batch = this.afs.firestore.batch();
+          const userRef = this.afs.doc(`users/${user.uid}`).ref;
+          const usernameRef = this.afs.doc(`username/${user.username}`).ref;
+          batch.update(userRef, user);
+          batch.set(usernameRef, { owner: user.uid });
+          const USER_CONFIG = await this.getConfigs();
+          this.tele.sendText(`https://api.whatsapp.com/send?phone=${user.hp}&text=Assalamualaikum.kak.${user.displayName}`, USER_CONFIG.tele_reg)
+          return batch.commit();
+        }
+      } else {
+        console.log('[UPDATE USER] Configured User');
+        return this.afs.doc(`users/${user.uid}`).update(user);
+      }
+    } catch (err) {
+      throw err;
     }
   }
 
   async validasiUser(user: User) {
     let result = {error: false, message: ''};
     try {
-      console.log(`62${user.hp}`);
       const uExist = (await this.afs.doc(`username/${user.username}`).ref.get()).exists;
-      const headers = { 'Access-Control-Allow-Headers': 'Origin' };
-      console.log(user.hp);
-      const getWA = await this.http.get( // 
-        // `https://api.telegram.org/bot996275173:AAEDEHi_r17sDMp2aw0Aq2ldZSYv8U2J0g0/getUpdates`,
-        `https://cors-anywhere.herokuapp.com/https://api.whatsapp.com/send?phone=62${user.hp}`,
-        {headers, responseType: 'text'}).toPromise();
-        const waExist = (getWA.indexOf('Kirim') !== -1);
-        console.log(getWA);
+      const waExist = await this.gql.cekWA(user.hp.toString());
+      // console.log('U: ' + uExist, 'W: ' + waExist);
+      // const headers = { 'Access-Control-Allow-Headers': 'Origin' };
+      // const getWA = await this.http.get( // 
+      //   // `https://api.telegram.org/bot996275173:AAEDEHi_r17sDMp2aw0Aq2ldZSYv8U2J0g0/getUpdates`,
+      //   `https://cors-anywhere.herokuapp.com/https://api.whatsapp.com/send?phone=62${user.hp}`,
+      //   {headers, responseType: 'text'}).toPromise();
+      // const waExist = (getWA.indexOf('Kirim') !== -1);
       if (uExist) { result = {error: true, message: 'Username tidak tersedia, pilih username lain'}}
       if (!waExist) { result = {error: true, message: 'Nomor Whatsapp tidak valid, masukkan nomor WA Aktif'}}
       return result;
@@ -108,6 +124,7 @@ export class UserService {
   }
 
   async logout() {
+    this.user$ = of(null);
     this.afAuth.auth.signOut().then(
       () => this.router.navigate(['/welcome'])
     );

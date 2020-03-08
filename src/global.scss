@@ -25,17 +25,22 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
-@import url('https://fonts.googleapis.com/css?family=Raleway:400,800&display=swap');
+// @import url('https://fonts.googleapis.com/css?family=Raleway:400,800&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans+JP:400,700&display=swap');
+// @import url('https://fonts.googleapis.com/css?family=Noto+Sans+HK:400,700&display=swap');
+// @import './theme/fonts.scss';
 
 :root,
 :root[mode="md"],
 :root[mode="ios"] {
-    --ion-font-family: 'Raleway', sans-serif;
+    // --ion-font-family: 'Raleway', sans-serif;
+    // --ion-font-family: 'Montserrat', sans-serif;
+    --ion-font-family: 'Noto Sans JP', sans-serif;
     font-family: var(--ion-font-family) !important;
 }
 
 // Custom CSS
-.dot{
+.dot {
     background: var(--ion-color-step-700, #777);
     border-radius: 50%;
     display: inline-block;
@@ -49,5 +54,20 @@
 ion-item {
     ion-chip {
         font-size: 10px;
+    }
+}
+ion-modal.auto-height {
+    --height: auto;
+    .modal-wrapper {
+        width: 90vw;
+        border-radius: 15px;
+        .ion-page {
+            position: relative;
+            contain: content;
+            max-height: 90vh;
+            .inner-content {
+                overflow: auto;
+            }
+        }
     }
 }

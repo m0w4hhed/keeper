@@ -1,14 +1,15 @@
-<ion-content color="light" scroll="false">
+<ion-content color="light" scroll="false" *ngIf="userService.user$ | async as user">
 
   <ion-list color="primary" class="ion-no-padding">
     <ion-item-group color="primary">
 
-      <ion-item button color="light" line="full" *ngFor="let x of [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]">
+      <ion-item button (click)="openInvoice(inv, user)" color="light" line="full" *ngFor="let inv of switcher.getInvoice(user) | async | orderBy:'-waktuOrder'">
         <ion-ripple-effect></ion-ripple-effect>
         <ion-label>
-          <h4><b>Pemesan </b><span class="text-secondary"><span class="dot"></span> +628111222333</span></h4>
-          <p class="text-secondary">1x Kirana Dress, +3 Produk</p>
-          <ion-badge>Rp. 570,000</ion-badge>
+          <h4><b>{{inv.penerima.nama.toUpperCase()}}&nbsp;</b><span class="text-secondary"><span class="dot"></span>&nbsp;+{{inv.penerima.hp}}</span></h4>
+          <p class="text-secondary">{{tool.titleCase(inv.pesanan[0].nama)}} {{tool.titleCase(inv.pesanan[0].warna)}}<span *ngIf="inv.pesanan.length>1">, +{{inv.pesanan.length-1}} Produk</span></p>
+          <ion-badge *ngIf="inv.total" [color]="inv.dibayar ? 'success' : ''">Rp.{{inv.total | number}}</ion-badge>
+          <ion-badge *ngIf="!inv.total" color="warning">Rp.{{inv.pesanan | pluck:'hargaBeli' | sum | number}}</ion-badge>
         </ion-label>
       </ion-item>
 
@@ -16,10 +17,10 @@
   </ion-list>
 </ion-content>
 
-<ion-footer *ngIf="userService.user$ | async">
+<ion-footer *ngIf="userService.user$ | async as user">
   <mat-accordion class="input-header">
     <mat-expansion-panel [expanded]="expand" hideToggle style="background-color: var(--ion-color-primary);border-radius: 0;">
-      <mat-expansion-panel-header [collapsedHeight]="'40px'" [expandedHeight]="'40px'" style="background-color: var(--ion-color-primary);">
+      <mat-expansion-panel-header [collapsedHeight]="'45px'" [expandedHeight]="'45px'" style="background-color: var(--ion-color-primary);">
         <mat-panel-title>
           <ion-icon name="add"></ion-icon>&nbsp;
           <strong>INPUT ORDERAN BARU</strong>
@@ -45,7 +46,7 @@
         </ion-item>
       </ion-list>
       <ion-button expand="block" fill="solid" color="light" [disabled]="!kecamatan || error"
-      (click)="submit(inputOrder)" style="margin: 5px 0 0;color:var(--ion-color-light);height: 32px;">
+      (click)="submit(inputOrder, user)" style="margin: 5px 0 0;color:var(--ion-color-light);height: 32px;">
         <ion-icon slot="start" name="add"></ion-icon>
         TAMBAH
       </ion-button>
