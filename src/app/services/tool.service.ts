@@ -1,6 +1,6 @@
+import { UserService } from 'src/app/services/user.service';
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
-import { DataService } from './data.service';
 import { Invoice, Penerima, Pengirim, Ambilan } from './interfaces/invoice';
 
 @Injectable({
@@ -8,8 +8,9 @@ import { Invoice, Penerima, Pengirim, Ambilan } from './interfaces/invoice';
 })
 export class ToolService {
 
-  dataBerat = [
-    /* default 500
+  // tslint:disable-next-line: variable-name
+  data_berat = [
+    // default 500
     {nama: 'dress', berat : 500},
     {nama: 'tas', berat : 500},
     {nama: 'bag', berat : 500},
@@ -17,7 +18,7 @@ export class ToolService {
     {nama: 'overall', berat : 500},
     {nama: 'kids', berat : 500},
     {nama: 'gown', berat : 500},
-    {nama: 'jeans', berat : 500}, */
+    {nama: 'jeans', berat : 500},
     {nama: 'tunic', berat : 350},
     {nama: 'tunik', berat : 350},
     {nama: 'koko', berat : 250},
@@ -39,6 +40,7 @@ export class ToolService {
   ];
 
   constructor(
+    private userService: UserService,
   ) {}
 
   getTime(format?: string) {
@@ -92,7 +94,7 @@ export class ToolService {
     inv.deposit = 0;
     inv.subtotal = 0;
     inv.berat = 0;
-  
+
     // getPenerima
     const penerima = {} as Penerima;
     const tex = splitText[0];
@@ -141,7 +143,6 @@ export class ToolService {
         // nama, warna, toko, hargaBeli, jumlah
         if (datas.length === 5) {
           const toko = datas[2].trim();
-          
           const jumlah = +datas[4].replace(/[^0-9]/g, '');
           for (let x = 1; x <= jumlah; x++) {
             const ambilan: Ambilan = {
@@ -182,7 +183,7 @@ export class ToolService {
     //   result = { error: 'maaf, id dropshiper tidak ditemukan'};
     // } else
     if ( error[0] === '0' ) {
-      result = { error: 'Format input order salah!' }
+      result = { error: 'Format input order salah!' };
     } else if ( error[0] === '1' ) {
       result = { error: `Format keep barang no.${error[1]} salah!`};
     } else if ( error[0] === '2' ) {
@@ -199,16 +200,36 @@ export class ToolService {
       return result[0].toString().trim();
     } else { return ''; }
   }
+  validasiToko(pesanan: Ambilan[]) {
+    const USER_CONFIG = this.userService.user_config$.value;
+    console.log(USER_CONFIG);
+    let result = { error: true, message: ''};
+    let exist = false; let blacklist = false;
+    let pesananIndex = -1; let tokoName = '';
+    pesanan.forEach(barang => {
+      USER_CONFIG.data_toko.forEach((toko, i) => {
+        if (toko.kode === barang.toko) {
+          exist = true; blacklist = toko.blacklist;
+          pesananIndex = i; tokoName = barang.toko;
+        }
+      });
+    });
+    if (exist) {
+
+    } else {
+      result.message = ''
+    }
+  }
   hitungBerat(barang: string) {
     let berat = 500;
-    this.dataBerat.forEach((data) => {
+    this.data_berat.forEach((data) => {
       if ( barang.includes(data.nama) ) {
         berat = data.berat;
       }
     });
     return berat;
   }
-  hitungHargaBeli(hargaJual: number) { //buat dinamis
+  hitungHargaBeli(hargaJual: number) { // buat dinamis
     if ( hargaJual >= 235 ) {
       return hargaJual - 35;
     } else {

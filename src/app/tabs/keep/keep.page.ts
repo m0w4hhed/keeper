@@ -79,7 +79,6 @@ export class KeepPage {
     this.inputOrder.penerima.prov_id = kec.province_id;
   }
   async submit(inputOrder: Invoice, user: User) {
-    console.log(inputOrder);
     inputOrder.owner = user.uid;
     inputOrder.cs = user.username;
     if (!inputOrder.pengirim.nama) {
@@ -90,7 +89,8 @@ export class KeepPage {
       ...barang,
       owner: user.uid,
       cs: user.username,
-    }))
+    }));
+    inputOrder.pesanan
     const modalCtrl = await this.modalCtrl.create({
       component: VerifikasiInputPage,
       componentProps: {

@@ -26,7 +26,7 @@ export class EkspedisiService {
   }
 
   async cekOngkir(asalID: number, tujuanID: number, berat: number) {
-    const USER_CONFIG = await this.userService.getConfigs();
+    const USER_CONFIG = await this.userService.user_config$.value;
     if (asalID && tujuanID && berat) {
       const headers = new HttpHeaders()
       .append('key', USER_CONFIG.key)
@@ -43,11 +43,12 @@ export class EkspedisiService {
       return item.subdistrict_name.toLowerCase().includes(searchTerm.toLowerCase());
     }).splice(0, maxResult);
   }
-  
+
   // cekOngkirNative(asalID: number, tujuanID: number, berat: number) {
   //   if (asalID && tujuanID && berat) {
   //     const headers = new HttpHeaders().append('Content-Type', 'application/x-www-form-urlencoded');
   //     // tslint:disable-next-line: max-line-length
+  // tslint:disable-next-line: max-line-length
   //     const data = `origin=${asalID.toString()}&originType=subdistrict&destination=${tujuanID.toString()}&destinationType=subdistrict&weight=${berat}&courier=${this.ekspedisi}`;
   //     const dataO = {
   //       origin: asalID.toString(),

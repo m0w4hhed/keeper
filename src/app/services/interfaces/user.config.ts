@@ -1,8 +1,8 @@
 export interface User {
     uid: string;
     email: string;
-    deposit: Number;
     displayName: string;
+    deposit: number;
     photoURL: string;
     username: string;
     hp: number;
@@ -11,10 +11,15 @@ export interface User {
 }
 
 export interface UserConfig {
-    wa_cs: number;
-    wa_keeper: number;
     cors_proxy: string;
+    data_toko: {
+        blacklist: boolean;
+        kode: string;
+        nama: string;
+    }[];
     graphqlAPI: string;
     key: string;
     tele_reg: string;
+    wa_cs: number;
+    wa_keeper: number;
 }

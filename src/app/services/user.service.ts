@@ -3,15 +3,12 @@ import { Router } from '@angular/router';
 import * as firebase from 'firebase';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
-import { Observable, of } from 'rxjs';
+import { Observable, of, BehaviorSubject } from 'rxjs';
 import { GooglePlus } from '@ionic-native/google-plus/ngx';
-import { switchMap, take, map, tap } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
+import { switchMap } from 'rxjs/operators';
 import { GraphqlService } from './graphql.service';
-import { PopupService } from './popup.service';
 import { User, UserConfig } from './interfaces/user.config';
 import { TelegramService } from './tele.service';
-import { ToolService } from './tool.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +16,8 @@ import { ToolService } from './tool.service';
 export class UserService {
 
   user$: Observable<User>;
+  // tslint:disable-next-line: variable-name
+  user_config$: BehaviorSubject<UserConfig>; task;
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -27,9 +26,9 @@ export class UserService {
     private router: Router,
     private afs: AngularFirestore,
     private tele: TelegramService,
-    private tool: ToolService,
     ) {
       this.user$ = this.auth();
+      this.task = this.getConfigs().subscribe(res => this.user_config$.next(res));
     }
 
   auth(): Observable<User> {
@@ -41,9 +40,10 @@ export class UserService {
     console.log('[*GET*] USER DATA UPDATED');
     return this.afs.doc<User>(`users/${uid}`).valueChanges();
   }
-  async getConfigs(): Promise<UserConfig> {
-    return (await this.afs.doc<UserConfig>(`configs/user_config`).ref.get()).data() as UserConfig;
-    // this.sharedConfig = this.afs.doc<SharedConfig>(`configs/user_config_share`).valueChanges();
+  getConfigs(): Observable<UserConfig> {
+    console.log('[*GET*] USER CONFIG UPDATED');
+    // return (await this.afs.doc<UserConfig>(`configs/user_config`).ref.get()).data() as UserConfig;
+    return this.afs.doc<UserConfig>(`configs/user_config`).valueChanges();
   }
 
   async loginWithGoogle() {
@@ -92,8 +92,9 @@ export class UserService {
           const usernameRef = this.afs.doc(`username/${user.username}`).ref;
           batch.update(userRef, user);
           batch.set(usernameRef, { owner: user.uid });
-          const USER_CONFIG = await this.getConfigs();
-          this.tele.sendText(`https://api.whatsapp.com/send?phone=${user.hp}&text=Assalamualaikum.kak.${user.displayName}`, USER_CONFIG.tele_reg)
+          // const USER_CONFIG = await this.getConfigs();
+          // tslint:disable-next-line: max-line-length
+          this.tele.sendText(`https://api.whatsapp.com/send?phone=${user.hp}&text=Assalamualaikum.kak.${user.displayName}`, this.user_config$.value.tele_reg);
           return batch.commit();
         }
       } else {
@@ -112,13 +113,13 @@ export class UserService {
       const waExist = await this.gql.cekWA(user.hp.toString());
       // console.log('U: ' + uExist, 'W: ' + waExist);
       // const headers = { 'Access-Control-Allow-Headers': 'Origin' };
-      // const getWA = await this.http.get( // 
+      // const getWA = await this.http.get( //
       //   // `https://api.telegram.org/bot996275173:AAEDEHi_r17sDMp2aw0Aq2ldZSYv8U2J0g0/getUpdates`,
       //   `https://cors-anywhere.herokuapp.com/https://api.whatsapp.com/send?phone=62${user.hp}`,
       //   {headers, responseType: 'text'}).toPromise();
       // const waExist = (getWA.indexOf('Kirim') !== -1);
-      if (uExist) { result = {error: true, message: 'Username tidak tersedia, pilih username lain'}}
-      if (!waExist) { result = {error: true, message: 'Nomor Whatsapp tidak valid, masukkan nomor WA Aktif'}}
+      if (uExist) { result = {error: true, message: 'Username tidak tersedia, pilih username lain'}; }
+      if (!waExist) { result = {error: true, message: 'Nomor Whatsapp tidak valid, masukkan nomor WA Aktif'}; }
       return result;
     } catch (err) { throw err; }
   }
