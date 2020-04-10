@@ -2,31 +2,32 @@ export interface Invoice {
     active: boolean;         // default: true
     owner: string;
     id: string;
-    kodeUnik: number;
     berat: number;          // gram
     cs: string;
     dicek: boolean;
-    deposit: number;
-    hutang: number;
     diskon: number;
     ekspedisi: Ekspedisi;
     penerima: Penerima;
     pengirim: Pengirim;
     pesanan: Ambilan[];
     status: string;         // keep, dibayar, dikirim
-    subtotal: number;
-    total: number;
-    waktuDibayar: number;
+    total?: number;
+    waktuDibayar?: number;
     waktuOrder: number;
-    waktuDicek: number;
-    resi: string;
+    waktuDicek?: number;
+    resi?: string;
     printed: boolean;
+    biaya_keep: number;
+    biaya_dibayar: boolean;
 }
 export interface Ambilan {
     owner: string;
     barcode: string;
+    biaya_keep: number;
+    biaya_dibayar: boolean;
     nama: string;        // nama
     warna: string;
+    kode: string;       // (default: '')
     berat: number;
     cs: string;
     hargaBeli: number;
@@ -34,10 +35,10 @@ export interface Ambilan {
     waktuKeep: number;
     penerima: string;
     toko: string;
-    pj: string;            // kode abang keeper
+    pj: string;            // kode abang keeper (default: '')
     statusKeep: string;    // (fullkeep/diambil/kosong)
-    waktuDiambil: number;   // unix timestamp
-    waktuPrint: number;     // unix timestamp
+    waktuDiambil: number;   // unix timestamp (default: 0)
+    waktuPrint: number;     // unix timestamp (default: 0)
     printed: boolean;
 }
 export interface Pengirim {

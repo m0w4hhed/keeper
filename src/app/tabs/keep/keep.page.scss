@@ -9,6 +9,7 @@ mat-panel-title {
     padding: 0 15px 15px !important;
 }
 ion-item {
+  height: auto;
   --highlight-color-focused: transparent;
   --highlight-color-valid: transparent;
   --highlight-color-invalid: transparent;
@@ -17,6 +18,10 @@ ion-badge {
   border-radius: 15px;
   padding: 4px 8px 5px;
   margin-top: 5px;
+}
+ion-textarea {
+  max-height: 261px;
+  overflow-y: auto;
 }
 
 // Input order css
@@ -70,8 +75,13 @@ ion-badge {
   color: var(--ion-color-primary);
   border-bottom: solid 2px var(--ion-color-primary);
 }
-.list-container {
+#fixScroll {
   margin-top: 5px;
+  max-height: 105px;
+  overflow: hidden;
+  overflow-y: auto;
+}
+.list-container {
   border: solid 1px var(--ion-color-light);
   border-radius: 5px;
 }

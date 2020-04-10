@@ -87,14 +87,17 @@ export class StorageService {
       return Promise.all([setData, setAmbilan]);
     } catch (err) { throw err; }
   }
-  getInvoice(invoiceID?: string): Observable<Invoice[]> | Observable<Invoice> {
-    if (invoiceID) {
-      return this.invoice$.asObservable().pipe(
-        map(inv => inv.find(i => i.id === invoiceID))
-      );
-    } else {
-      return this.invoice$.asObservable();
-    }
+  getInvoice(invoiceID: string): Observable<Invoice> {
+    return this.invoice$.asObservable().pipe(
+      switchMap(inv => {
+        const data = inv.find(i => i.id === invoiceID);
+        if (data) { return of(data);
+        } else { return of({} as Invoice); }
+      })
+    );
+  }
+  getInvoices(): Observable<Invoice[]> {
+    return this.invoice$.asObservable();
   }
   getAmbilan(barcode?: string): Observable<Ambilan[]> | Observable<Ambilan> {
     if (barcode) {

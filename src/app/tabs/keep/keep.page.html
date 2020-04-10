@@ -1,54 +1,77 @@
-<ion-content color="light" scroll="false" *ngIf="userService.user$ | async as user">
+<ion-content color="light" scroll="false" *ngIf="user">
 
   <ion-list color="primary" class="ion-no-padding">
-    <ion-item-group color="primary">
-
-      <ion-item button (click)="openInvoice(inv, user)" color="light" line="full" *ngFor="let inv of switcher.getInvoice(user) | async | orderBy:'-waktuOrder'">
+    <ion-item-group color="primary" *ngIf="invoices as invoice">
+      <ion-item button (click)="openInvoice(inv)" color="light" line="full" *ngFor="let inv of modeSwitcher(invoice, user) | orderBy:'-waktuOrder'">
         <ion-ripple-effect></ion-ripple-effect>
         <ion-label>
           <h4><b>{{inv.penerima.nama.toUpperCase()}}&nbsp;</b><span class="text-secondary"><span class="dot"></span>&nbsp;+{{inv.penerima.hp}}</span></h4>
-          <p class="text-secondary">{{tool.titleCase(inv.pesanan[0].nama)}} {{tool.titleCase(inv.pesanan[0].warna)}}<span *ngIf="inv.pesanan.length>1">, +{{inv.pesanan.length-1}} Produk</span></p>
-          <ion-badge *ngIf="inv.total" [color]="inv.dibayar ? 'success' : ''">Rp.{{inv.total | number}}</ion-badge>
-          <ion-badge *ngIf="!inv.total" color="warning">Rp.{{inv.pesanan | pluck:'hargaBeli' | sum | number}}</ion-badge>
+          <p class="text-secondary"><span>+{{inv.pesanan.length}} Produk Pesanan</span></p>
+
+          <ion-badge [color]="inv.dibayar?'success':'warning'">
+            <ion-text *ngIf="inv.total">Rp.{{inv.total | number}}</ion-text>
+            <ion-text *ngIf="!inv.total">Belum Totalan</ion-text>
+          </ion-badge>
+
+          <ion-badge [color]="inv.biaya_dibayar?'success':'danger'" style="margin-left: 5px;">
+            <ion-icon style="font-size: 10px;" name="wallet"></ion-icon>&nbsp;
+            <ion-text *ngIf="!inv.biaya_dibayar">Belum Dibayar</ion-text>
+            <ion-text *ngIf="inv.biaya_dibayar">Keep Dibayar</ion-text>
+          </ion-badge>
+
         </ion-label>
       </ion-item>
-
     </ion-item-group>
   </ion-list>
 </ion-content>
 
-<ion-footer *ngIf="userService.user$ | async as user">
+<ion-footer *ngIf="user">
   <mat-accordion class="input-header">
-    <mat-expansion-panel [expanded]="expand" hideToggle style="background-color: var(--ion-color-primary);border-radius: 0;">
+    <mat-expansion-panel (opened)="openInput()" [expanded]="expand" hideToggle style="background-color: var(--ion-color-primary);border-radius: 0;">
       <mat-expansion-panel-header [collapsedHeight]="'45px'" [expandedHeight]="'45px'" style="background-color: var(--ion-color-primary);">
         <mat-panel-title>
-          <ion-icon name="add"></ion-icon>&nbsp;
-          <strong>INPUT ORDERAN BARU</strong>
+          <ion-icon [name]="trialMode?'close':'add'"></ion-icon>&nbsp;
+          <strong *ngIf="!trialMode">INPUT ORDERAN BARU</strong>
+          <strong *ngIf="trialMode">AKTIVASI AKUN DAHULU</strong>
         </mat-panel-title>
       </mat-expansion-panel-header>
       <ion-item [color]="(error && input)?'warning':'light'" class="papper">
         <div class="triangle-back"></div>
         <div [class]="(error && input)?'triangle-folded not-found':'triangle-folded found'"></div>
-        <ion-textarea style="margin-bottom: 20px;" placeholder="Paste format order disini..." rows="7" autoGrow="true" [(ngModel)]="input" (ngModelChange)="baca(input)"></ion-textarea >
+        <ion-textarea #inputan [disabled]="trialMode" style="margin-bottom: 30px;" [(ngModel)]="input" (ngModelChange)="baca(input)"
+          [placeholder]="trialMode?'Batas pemakaian tercapai!, aktivasi akun untuk menambah input order :)':'Paste format order disini...'" rows="7" maxRows="12" autoGrow="true"></ion-textarea >
+        <ion-buttons style="position: absolute;right:0;bottom:0;">
+          <ion-button (click)="help()" [color]="(error && input)?'light':'primary'"><ion-icon name="help-circle" slot="icon-only"></ion-icon></ion-button>
+        </ion-buttons>
         <div [class]="error?'thin-label text-error':'thin-label text-success'" *ngIf="input?.length>0" >
           <span *ngIf="error">{{error}}</span>
           <span *ngIf="!error && inputOrder">Pilih Kecamatan:</span>
         </div>
       </ion-item>
-      <ion-list class="ion-no-padding list-container" *ngIf="input?.length>0 && inputOrder && !error">
-        <ion-item button *ngFor="let kec of listKecamatan" color="primary"
-        class="thin-list" (click)="pilih(kec)" lines="full">
+      <ion-list style="margin-top: 5px;" class="ion-no-padding list-container" *ngIf="actionOnError && error">
+        <ion-item button color="primary" class="thin-list" (click)="openToko()" lines="full">
           <ion-ripple-effect></ion-ripple-effect>
           <ion-label class="thin-list-kec" style="margin-bottom: 5px;">
-            <strong>{{kec.subdistrict_name}}</strong>, {{kec.city}}, {{kec.province}}
+            <strong>LIHAT LIST TOKO YG DIDUKUNG</strong>
           </ion-label>
-          <ion-icon class="checkmark" name="checkmark" *ngIf="kec===kecamatan"></ion-icon>
         </ion-item>
       </ion-list>
-      <ion-button expand="block" fill="solid" color="light" [disabled]="!kecamatan || error"
+      <div scrollY="true" id="fixScroll">
+        <ion-list class="ion-no-padding list-container" *ngIf="input?.length>0 && inputOrder && !error">
+          <ion-item button *ngFor="let kec of listKecamatan" color="primary"
+          class="thin-list" (click)="pilih(kec)" lines="full">
+            <ion-ripple-effect></ion-ripple-effect>
+            <ion-label class="thin-list-kec" style="margin-bottom: 5px;">
+              <strong>{{kec.subdistrict_name}}</strong>, {{kec.city}}, {{kec.province}}
+            </ion-label>
+            <ion-icon class="checkmark" name="checkmark" *ngIf="kec===kecamatan"></ion-icon>
+          </ion-item>
+        </ion-list>
+      </div>
+      <ion-button expand="block" fill="solid" color="light" [disabled]="!kecamatan || error || trialMode"
       (click)="submit(inputOrder, user)" style="margin: 5px 0 0;color:var(--ion-color-light);height: 32px;">
-        <ion-icon slot="start" name="add"></ion-icon>
-        TAMBAH
+        <span *ngIf="!trialMode"><ion-icon slot="start" name="add"></ion-icon>&nbsp;TAMBAH</span>
+        <span *ngIf="trialMode"><ion-icon slot="start" name="close"></ion-icon>&nbsp;AKTIVASI AKUN DAHULU</span>
       </ion-button>
     </mat-expansion-panel>
   </mat-accordion>

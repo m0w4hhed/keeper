@@ -1,16 +1,19 @@
-import { Component } from '@angular/core';
+import { PopupService } from './../../services/popup.service';
+import { Component, ViewChild } from '@angular/core';
 import { Invoice } from 'src/app/services/interfaces/invoice';
 import { Kecamatan } from 'src/app/services/interfaces/ongkir';
 import { UserService } from 'src/app/services/user.service';
-import { DataService } from 'src/app/services/data.service';
 import { ToolService } from 'src/app/services/tool.service';
 import { EkspedisiService } from 'src/app/services/ekspedisi.service';
-import { ModalController, Platform } from '@ionic/angular';
-import { StorageService } from 'src/app/services/storage.service';
+import { ModalController, Platform, IonInput } from '@ionic/angular';
 import { VerifikasiInputPage } from 'src/app/pages/verifikasi-input/verifikasi-input.page';
 import { User } from 'src/app/services/interfaces/user.config';
-import { EditInvoicePage } from 'src/app/pages/edit-invoice/edit-invoice.page';
 import { SwitcherService } from 'src/app/services/switcher.service';
+import { EditInvoicePage } from 'src/app/pages/invoice/edit-invoice/edit-invoice.page';
+import { ListTokoPage } from 'src/app/pages/list-toko/list-toko.page';
+import { EditInvoiceTrialPage } from 'src/app/pages/invoice/edit-invoice-trial/edit-invoice-trial.page';
+// import { ListTokoPage } from 'src/app/pages/list-toko/list-toko.page';
+// import { EditInvoiceTrialPage } from 'src/app/pages/invoice/edit-invoice-trial/edit-invoice-trial.page';
 
 @Component({
   selector: 'app-keep',
@@ -20,52 +23,85 @@ import { SwitcherService } from 'src/app/services/switcher.service';
 export class KeepPage {
 
   onload = true;
-  // invoices;
+  user: User; task;
+  invoices: Invoice[]; task2;
 
   expand = false;
+  trialMode = false;
 
   input: string;
-  inputOrder: Invoice; error;
+  inputOrder: Invoice;
+  error; actionOnError = false;
   listKecamatan: Kecamatan[];
   kecamatan: Kecamatan;
+
+  @ViewChild('inputan', {static: false}) inputArea: IonInput;
 
   constructor(
     public userService: UserService,
     public switcher: SwitcherService,
-    private plt: Platform,
     public tool: ToolService,
+    private popup: PopupService,
     private ekspedisi: EkspedisiService,
     private modalCtrl: ModalController,
+    private plt: Platform,
   ) {
-    // this.dataService.c();
-    // this.plt.ready().then(() => this.invoices = this.switcher.getInvoice());
+    this.task = this.userService.user$.subscribe(user => {
+      if (user) {
+        this.user = user;
+        this.plt.ready().then(() => {
+          this.task2 = this.switcher.getInvoices(user).subscribe(
+            (res: Invoice[]) => {
+              this.invoices = res;
+              // console.log(res);
+            },
+            err => console.log(err)
+          );
+        });
+      }
+    });
   }
 
-  async openInvoice(invoice: Invoice, user: User) {
+  openInput() {
+    console.log('open')
+    this.inputArea.setFocus();
+  }
+
+  async openInvoice(invoice: Invoice) {
     const modal = await this.modalCtrl.create({
-      component: EditInvoicePage,
-      componentProps: { id: invoice.id, user }
+      component: this.user.activated ? EditInvoicePage : EditInvoiceTrialPage,
+      componentProps: { id: invoice.id, user: this.user }
     });
-    modal.present();
+    return await modal.present();
+  }
+  async openToko() {
+    const modal = await this.modalCtrl.create({
+      component: ListTokoPage,
+    });
+    return await modal.present();
+  }
+  help() {
+    this.popup.showAd('https://images.wallpaperscraft.com/image/kitten_tabby_cat_lying_legs_muzzle_whiskers_78459_800x1200.jpg')
   }
 
   baca(input: string) {
+    this.error = null;
+    this.actionOnError = false;
+    this.listKecamatan = [];
     if (input) {
       if (input === '') {
         this.inputOrder = {} as Invoice;
       } else {
-        const result = this.tool.baca(input);
+        const result = this.tool.baca(input, this.user);
         if (result.error) {
           this.error = result.error;
         } else {
-          this.error = null;
-          this.listKecamatan = [];
           this.inputOrder = result.data;
           const kec = this.inputOrder.penerima.kec;
           if (kec) {
-            this.listKecamatan = this.ekspedisi.cariKecamatan(kec.trim(), 5);
+            this.listKecamatan = this.ekspedisi.cariKecamatan(kec, 50);
           }
-          if (this.listKecamatan.length === 0) { this.error = `Kecamatan "${kec}" tidak ditemukan!`; }
+          if (this.listKecamatan.length === 0) { this.error = `Kecamatan ${kec} tidak ditemukan!`; }
         }
       }
     }
@@ -85,12 +121,13 @@ export class KeepPage {
       inputOrder.pengirim.nama = user.displayName.toLowerCase();
       inputOrder.pengirim.hp = user.hp;
     }
-    inputOrder.pesanan = inputOrder.pesanan.map(({owner, cs, ...barang}) => ({
+    inputOrder.pesanan = inputOrder.pesanan.map(
+      ({owner, cs, ...barang}) => ({
       ...barang,
       owner: user.uid,
       cs: user.username,
-    }));
-    inputOrder.pesanan
+      })
+    );
     const modalCtrl = await this.modalCtrl.create({
       component: VerifikasiInputPage,
       componentProps: {
@@ -101,7 +138,21 @@ export class KeepPage {
     this.inputOrder = null; this.error = null;
     this.listKecamatan = null;
     this.kecamatan = null;
-    return await modalCtrl.present();
+    await modalCtrl.present();
+
+    const backData = (await modalCtrl.onWillDismiss()).data;
+    if (backData) { this.inputOrder = backData; }
+  }
+
+  modeSwitcher(invoice: Invoice[], user: User) {
+    if (invoice && !user.activated) {
+      this.trialMode = (invoice.length >= 2)
+    }
+    return invoice;
+  }
+
+  onDestroy() {
+    this.task.unsubscribe();
   }
 
 }

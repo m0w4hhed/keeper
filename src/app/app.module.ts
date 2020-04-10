@@ -11,12 +11,6 @@ import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-// Component Modules
-import { AppComponent } from './app.component';
-import { WelcomePageModule } from './pages/auth/welcome/welcome.module';
-import { VerifikasiInputPageModule } from './pages/verifikasi-input/verifikasi-input.module';
-import { RegisterPageModule } from './pages/auth/register/register.module';
-
 // AngularFire Modules
 import { environment } from '../environments/environment';
 import { AngularFireModule } from '@angular/fire';
@@ -31,8 +25,16 @@ import { HttpClientModule } from '@angular/common/http';
 import { AuthGuard } from './pages/auth/guard/auth.guard';
 import { IonicStorageModule } from '@ionic/storage';
 import { FormsModule } from '@angular/forms';
-import { EditInvoicePageModule } from './pages/edit-invoice/edit-invoice.module';
+
+// Component Modules
+import { AppComponent } from './app.component';
+import { WelcomePageModule } from './pages/auth/welcome/welcome.module';
+import { VerifikasiInputPageModule } from './pages/verifikasi-input/verifikasi-input.module';
+import { RegisterPageModule } from './pages/auth/register/register.module';
+import { EditInvoicePageModule } from './pages/invoice/edit-invoice/edit-invoice.module';
 import { EditModalPageModule } from './pages/modals/edit-modal/edit-modal.module';
+import { ListTokoPageModule } from './pages/list-toko/list-toko.module';
+import { EditInvoiceTrialPageModule } from './pages/invoice/edit-invoice-trial/edit-invoice-trial.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -51,6 +53,8 @@ import { EditModalPageModule } from './pages/modals/edit-modal/edit-modal.module
     WelcomePageModule,
     EditInvoicePageModule,
     EditModalPageModule,
+    EditInvoiceTrialPageModule,
+    ListTokoPageModule,
     // Angularfire Modules
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,

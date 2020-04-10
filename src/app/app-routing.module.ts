@@ -25,12 +25,21 @@ const routes: Routes = [
   },
   {
     path: 'edit-invoice',
-    loadChildren: () => import('./pages/edit-invoice/edit-invoice.module').then( m => m.EditInvoicePageModule)
+    loadChildren: () => import('./pages/invoice/edit-invoice/edit-invoice.module').then( m => m.EditInvoicePageModule)
   },
   {
     path: 'edit-modal',
     loadChildren: () => import('./pages/modals/edit-modal/edit-modal.module').then( m => m.EditModalPageModule)
+  },
+  {
+    path: 'list-toko',
+    loadChildren: () => import('./pages/list-toko/list-toko.module').then( m => m.ListTokoPageModule)
+  },
+  {
+    path: 'edit-invoice-trial',
+    loadChildren: () => import('./pages/invoice/edit-invoice-trial/edit-invoice-trial.module').then( m => m.EditInvoiceTrialPageModule)
   }
+
 ];
 @NgModule({
   imports: [

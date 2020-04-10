@@ -1,7 +1,20 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { User } from './interfaces/user.config';
+import { WhereFilterOp } from '@firebase/firestore-types';
+import { User, DataToko } from './interfaces/user.config';
 import { Invoice, Ambilan } from './interfaces/invoice';
+import { Observable } from 'rxjs';
+
+/**
+ * @param field nama field dari document
+ * @param comp comparator string firestore
+ * @param value value dari field
+ */
+export interface Filter {
+  field: string;
+  comp: WhereFilterOp;
+  value: string|number|boolean;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -11,78 +24,34 @@ export class DataService {
   constructor(
     private afs: AngularFirestore,
   ) {
-    // this.c().then(() => console.log('TOKO CREATED'));
+  }
+  
+  getDatas<T>(dbName: string, filter: Filter[], searchMode?: {field: string, search: string}|null, rangeDate?: {from: number, to: number, orderBy: string}|null): Observable<T[]> {
+    return this.afs.collection<T>(dbName, ref => {
+      let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
+      if (searchMode) {
+        console.log(`[FTR] Search value ${filter[0].value}`);
+        const start = searchMode.search.toLowerCase();
+        const end = start + '\uf8ff';
+        query = query.limit(10).orderBy(searchMode.field).startAt(start).endAt(end);
+      } else {
+        if (rangeDate) {
+          query = query.orderBy(rangeDate.orderBy).startAt(rangeDate.from).endAt(rangeDate.to);
+        }
+      }
+      filter.forEach(f => {
+        query = query.where(f.field, f.comp, f.value);
+      });
+      return query;
+    }).valueChanges();
+  }
+  getData<T>(docPath: string): Observable<T> {
+    return this.afs.doc<T>(docPath).valueChanges();
   }
 
-  // c() { //sampe sini buat list toko
-  //   const dataToko = [
-  //     {kode: 'denora', nama : 'denora'},
-  //     {kode: 'beauty', nama : 'beauty'},
-  //     {kode: 'mpmf', nama : 'mpmf'},
-  //     {kode: 'fuchia', nama : 'fuchia'},
-  //     {kode: 'maritza', nama : 'maritza'},
-  //     {kode: 'jelita', nama : 'jelita'},
-  //     {kode: 'alila', nama : 'alila'},
-  //     {kode: 'alila2', nama : 'alila 2'},
-  //     {kode: 'lts', nama : 'lts shofiya'},
-  //     {kode: 'shofiyah', nama : 'shofiyah miraa'},
-  //     {kode: 'qilla', nama : 'qilla'},
-  //     {kode: 'kanza', nama : 'kanza'},
-  //     {kode: 'alfa', nama : 'alfa'},
-  //     {kode: 'unique', nama : 'unique'},
-  //     {kode: 'afka', nama : 'afka'},
-  //     {kode: 'ama', nama : 'ama najwa'},
-  //     {kode: 'ama2', nama : 'ama najwa 2'},
-  //     {kode: 'foyou', nama : 'foyou'},
-  //     {kode: 'dj', nama : 'dj fashion'},
-  //     {kode: 'anisa', nama : 'anisa'},
-  //     {kode: 'abella', nama : 'abella'},
-  //     {kode: 'billal', nama : 'billal'},
-  //     {kode: 'sf', nama : 'shofiyah fashion'},
-  //     {kode: 'aderra', nama : 'aderra'},
-  //     {kode: 'fc', nama : 'f collection'},
-  //     {kode: 'olive', nama : 'olive shoes'},
-  //     {kode: 'nabtik', nama : 'nabtik'},
-  //     {kode: 'uwais', nama : 'uwais hijab'},
-  //     {kode: 'shafeea', nama : 'shafeea hijab'},
-  //     {kode: 'sisters', nama : `sister's hijab`},
-  //     {kode: 'spassy', nama : 'spassy'},
-  //     {kode: 'en', nama : 'en hijab'},
-  //     {kode: 'shafara', nama : 'shafara oval hijab luvis'},
-  //     {kode: 'akifa', nama : 'akifa'},
-  //     {kode: 'hh', nama : 'hijab hubby'},
-  //     {kode: 'ellora', nama : 'ellora'},
-  //     {kode: 'bm', nama : 'belanja murah'},
-  //     {kode: 'rasepi', nama : 'rasepi'},
-  //     {kode: 'svj', nama : 'svj batik'},
-  //     {kode: 'ba', nama : 'butik ashanty'},
-  //     {kode: 'cla', nama : 'cla hijab'},
-  //     {kode: 'intanaka', nama : 'intanaka'},
-  //     {kode: 'yusha', nama : 'yusha ilyasa'},
-  //     {kode: 'orinawa', nama : 'orinawa'},
-  //     {kode: 'orinaura', nama : 'orinaura'},
-  //     {kode: 'asta bag', nama : 'asta bag'},
-  //     {kode: 'asta kc', nama : 'asta kacamata'},
-  //     {kode: 'redea', nama : 'redea hijab'},
-  //     {kode: 'zarra', nama : 'zarra'},
-  //     {kode: 'najwa', nama : 'najwa hijab'},
-  //     {kode: 'vanilla', nama : 'vanilla'},
-  //     {kode: 'adore', nama : 'adore'},
-  //     {kode: 'edelweis', nama : 'edelweiss'},
-  //     {kode: 'panda', nama : 'panda jaket'},
-  //     {kode: 'sancaka', nama : 'sancaka'},
-  //     {kode: 'dod', nama : 'dod shop'},
-  //     {kode: 'juana', nama : 'juana'},
-  //     {kode: 'epie', nama : 'epie'}
-  //   ];
-  //   this.afs.collection('configs').doc('user_config').update({data_toko: dataToko.map(d => ({...d, blacklist: false}))});
-  //   const batch = this.afs.firestore.batch();
-  //   dataToko.forEach(toko => {
-  //     const refToko = this.afs.collection('configs').doc('user_config').collection('data_toko').doc(toko.kode).ref;
-  //     batch.set(refToko, { nama: toko.nama, lantai: 0, blok: '', hpKeep: 0, hpDaftar: 0, foto: '', jual: [], active: true });
-  //   });
-  //   return batch.commit();
-  // }
+  async getTokoInfo(idToko: string) {
+    return (await this.afs.collection('configs').doc('user_config').collection('data_toko').doc(idToko).ref.get()).data() as DataToko;
+  }
 
   async createInvoice(user: User, inv: Invoice) {
     // console.log(inv);

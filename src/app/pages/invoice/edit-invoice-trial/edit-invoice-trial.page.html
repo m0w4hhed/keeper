@@ -1,0 +1,92 @@
+<ion-header *ngIf="invoice | async as inv">
+  <ion-toolbar color="secondary" mode="ios">
+    <ion-buttons mode="md" slot="start">
+      <ion-button (click)="dismiss()" >
+        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Informasi Invoice</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="delete(user, inv)" >
+        <ion-icon slot="icon-only" name="trash"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar style="padding: 0 15px;" color="secondary">
+    <p>
+      <span class="title">Invoice</span> <br>
+      <span class="titleName">#{{inv.id}}</span>
+    </p>
+    <p slot="end" style="text-align: right;">
+      <span class="title">Tanggal</span> <br>
+      <span class="titleName">{{(inv.waktuOrder*1000) | date:'dd/MM/yyyy'}}</span>
+    </p>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="light" *ngIf="invoice | async as inv">
+  <ion-item button color="light" lines="none" style="height:auto;">
+    <ion-icon class="avatar" name="navigate-circle" slot="start"></ion-icon>
+    <ion-label style="white-space: inherit;">
+      <b>{{inv.penerima.nama.toUpperCase()}}</b>
+      <p>+{{inv.penerima.hp}}</p>
+      <span class="note" style="font-size: 15px;">
+        {{tool.titleCase(inv.penerima.alamat)}},
+        Kec. {{tool.titleCase(inv.penerima.kec)}},&nbsp;
+        Kab. {{inv.penerima.kab}},&nbsp;
+        Prov. {{inv.penerima.prov}}
+      </span>
+    </ion-label>
+  </ion-item>
+  <ion-item button color="light" lines="full" style="height:auto;">
+    <ion-ripple-effect></ion-ripple-effect>
+    <ion-icon class="avatar" name="gift" slot="start"></ion-icon>
+    <p style="margin: 5px 0 10px;">
+      <span class="title" style="color: var(--ion-color-primary);">Pengirim</span> <br>
+      <span class="titleName">{{inv.pengirim.nama.toUpperCase()}} | +{{inv.pengirim.hp}}</span> <br>
+    </p>
+  </ion-item>
+  <ion-list style="padding:0" color="light">
+    <ion-item-divider color="light" style="border-bottom: none;margin-top: 8px;color: var(--ion-color-primary);">
+      <p style="color: var(--ion-color-primary);">Barang</p>
+      <p slot="end" style="margin-right: 17px;color: var(--ion-color-primary);">Harga Beli</p>
+    </ion-item-divider>
+    <ion-item button *ngFor="let item of inv.pesanan; let i = index" color="light" [lines]="(inv.pesanan.length===(i+1))?'':'none'">
+      <ion-ripple-effect></ion-ripple-effect>
+      <ion-label>
+        <strong> {{tool.titleCase(item.nama)}} </strong> {{tool.titleCase(item.warna)}}
+        <p class="note">
+          {{item.toko.toUpperCase()}} | {{item.berat}} gram
+        </p>
+      </ion-label>
+      <ion-note slot="end"><b>Rp.{{item.hargaBeli | number}}</b></ion-note>
+    </ion-item>
+    <ion-item color="light" lines="none" class="align-right">
+      <ion-label><b>Subtotal:</b></ion-label>
+      <ion-note slot="end"><strong>Rp.{{(inv.pesanan | pluck:'hargaBeli' | sum) | number}}</strong></ion-note>
+    </ion-item>
+    <ion-item color="light" lines="none" class="align-right">
+      <ion-label>Biaya Keep:</ion-label>
+      <ion-note slot="end">Rp.{{inv.pesanan | pluck:'biaya_keep' | sum | number}}</ion-note>
+    </ion-item>
+    <!-- <ion-item color="light" lines="none">
+      <ion-label>Kode Unik:</ion-label>
+      <ion-note slot="end" style="font-size: 15px; padding: 14px 0 14px 16px;color: var(--ion-color-dark);">Rp.{{inv.kodeUnik | number}}</ion-note>
+    </ion-item> -->
+    <ion-item button color="light" lines="none" class="align-right" (click)="isAddDiskon=true">
+      <ion-label>
+        Diskon:
+        <span class="note" *ngIf="!isAddDiskon">(ketuk edit)</span>
+      </ion-label>
+      <ion-input *ngIf="isAddDiskon" [(ngModel)]="inv.diskon" type="number" class="primary"></ion-input>
+      <ion-note *ngIf="!isAddDiskon" slot="end" class="primary">-Rp.{{inv.diskon | number}}</ion-note>
+    </ion-item>
+    <ion-item button color="light" lines="none" detail>
+      <ion-label>Pilih Ekspedisi</ion-label>
+    </ion-item>
+    <ion-item color="light" lines="none">
+      <ion-label color="primary" style="font-size: 18px;"><b>Total:</b></ion-label>
+      <ion-note slot="end" style="font-size: 18px;" class="primary"><b>Pilih Ekspedisi Dulu</b></ion-note>
+    </ion-item>
+  </ion-list>
+</ion-content>

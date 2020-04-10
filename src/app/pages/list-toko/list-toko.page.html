@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar mode="ios" color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()" >
+        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>TOKO TERDAFTAR</ion-title>
+  </ion-toolbar>
+  <ion-toolbar mode="ios" color="primary">
+    <ion-searchbar placeholder="Cari kode toko" showCancelButton="focus" (ionChange)="cari($event.target.value)" (ionCancel)="modeCari=false"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="light">
+  <ion-item-divider sticky>
+    <span style="margin: 0 auto;">ketuk untuk melihat detail toko</span>
+  </ion-item-divider>
+  <ion-list class="ion-no-padding" color="light" *ngIf="!modeCari">
+    <ion-item button (click)="detailToko(toko)" *ngFor="let toko of listToko | orderBy: '+'" color="light">
+      <ion-label [color]="(onload && toko === cekToko)?'primary':'dark'">
+        {{toko}}&nbsp;
+        <ion-spinner color="primary" name="dots" *ngIf="onload && toko === cekToko" style="height: 13px;"></ion-spinner>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+  <ion-list class="ion-no-padding" color="light" *ngIf="modeCari">
+    <ion-item button (click)="detailToko(toko)" *ngFor="let toko of listCari | orderBy: '+'" color="light">
+      <ion-label [color]="(onload && toko === cekToko)?'primary':'dark'">
+        <b>{{toko}}</b>&nbsp;
+        <ion-spinner color="primary" name="dots" *ngIf="onload && toko === cekToko"></ion-spinner>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
+
+<ion-footer>
+  <ion-button (click)="contact()" style="margin:0; height:40px" color="primary" expand="full">
+    <ion-icon name="add"></ion-icon>&nbsp;REQUEST TOKO
+  </ion-button>
+</ion-footer>

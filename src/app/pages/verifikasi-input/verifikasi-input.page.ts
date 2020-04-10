@@ -19,7 +19,6 @@ import { SwitcherService } from 'src/app/services/switcher.service';
 export class VerifikasiInputPage implements OnInit {
   
   isAddDiskon = false;
-  isAddDeposit = false;
   isProcessing = false;
 
   inputOrder: Invoice;
@@ -37,8 +36,8 @@ export class VerifikasiInputPage implements OnInit {
   ngOnInit() {
   }
 
-  dismiss() {
-    this.modalC2.dismiss();
+  dismiss(data?: any|null) {
+    this.modalC2.dismiss(data);
   }
 
   verif() {
