@@ -173,3 +173,18 @@ ion-footer {
 .text-secondary {
     color: var(--ion-color-step-700, #777) !important;
 }
+
+div.image-holder {
+  text-align: center;
+  background-color: var(--ion-color-light);
+  img {
+    width: 50%;
+    padding-top: 80px;
+    display: block;
+    margin: 0 auto;
+    opacity: 50%;
+  }
+  ion-label {
+    opacity: 50%;
+  }
+}

@@ -1,0 +1,124 @@
+<ion-header *ngIf="invoice as inv">
+  <ion-toolbar color="primary" mode="ios">
+    <ion-buttons mode="md" slot="start">
+      <ion-button (click)="dismiss()" >
+        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Biaya Keep</ion-title>
+  </ion-toolbar>
+  <ion-toolbar style="padding: 0 15px;" color="secondary">
+    <p>
+      <span class="toolbar-title">Invoice</span> <br>
+      <span class="toolbar-note">#{{inv.id}}</span>
+    </p>
+    <p slot="end" style="text-align: right;">
+      <span class="toolbar-title">Tanggal</span> <br>
+      <span class="toolbar-note">{{(inv.waktuOrder*1000) | date:'dd/MM/yyyy'}}</span>
+    </p>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="invoice as inv" color="light">
+
+  <ion-list class="ion-no-padding">
+    <ion-item-divider color="light" style="border-bottom:none;color: var(--ion-color-primary);">
+      <span style="color: var(--ion-color-primary);">
+        Pesanan
+      </span>
+      <span slot="end" style="margin-right: 15px;text-align: right;">
+        <p style="margin:0;">Biaya Keep</p>
+      </span>
+    </ion-item-divider>
+
+    <ion-item button *ngFor="let item of inv.pesanan; let i = index" color="light" [lines]="(inv.pesanan.length===(i+1))?'full':'none'">
+      <ion-label class="no-margin">
+        <strong> {{tool.titleCase(item.nama)}} </strong> {{tool.titleCase(item.warna)}}
+        <p class="note">
+          <ion-icon name="checkmark-circle" [color]="item.biaya_dibayar?'success':'dark'"></ion-icon>
+          Beli: Rp.{{item.hargaBeli | number}} + Biaya Rp.{{item.biaya_keep | number}}
+        </p>
+      </ion-label>
+      <ion-note slot="end" style="text-align:right;padding: 8px 0;">
+        <p style="margin: 0;">Rp.{{item.hargaBeli + item.biaya_keep | number}}</p>
+      </ion-note>
+    </ion-item>
+
+    <ion-item color="light" lines="none">
+      <ion-label class="no-margin">
+        <b>{{inv.ekspedisi.kurir | uppercase}}</b> {{inv.ekspedisi.service | uppercase}}
+      </ion-label>
+      <ion-note slot="end" class="primary">Rp.{{inv.ekspedisi.ongkir | number}}</ion-note>
+    </ion-item>
+
+    <ion-item-divider class="title">
+      <ion-icon name="search" color="primary"></ion-icon>
+      <b>RIWAYAT PEMBAYARAN</b>
+    </ion-item-divider>
+    <ion-item *ngIf="onload" lines="full" color="grey">
+      <ion-label>
+        <h2><ion-skeleton-text animated style="width: 60%;height: 14px"></ion-skeleton-text></h2>
+        <p><ion-skeleton-text animated style="width: 40%"></ion-skeleton-text></p>
+      </ion-label>
+      <ion-note style="padding: 0;">
+        <h5 style="color: #bb0303">
+          <strong><ion-skeleton-text animated style="width: 75px;height: 20px;"></ion-skeleton-text></strong>
+        </h5>
+      </ion-note>
+    </ion-item>
+    <ion-item *ngIf="!onload && pembayaran.length === 0" lines="full" color="grey">
+      <span>TIDAK ADA RIWAYAT PEMBAYARAN</span>
+    </ion-item>
+    <ion-list class="ion-no-padding">
+      <ion-item *ngFor="let data of pembayaran" color="grey" lines="full">
+        <ion-label>
+          {{data.type | uppercase}}
+          <ion-icon name="checkmark-circle" [color]="data.dicek?'success':'dark'"></ion-icon>
+          <p *ngIf="data.type==='pembayaran'" style="color: var(--ion-color-medium-tint);">{{data.pesanan.length}}Pcs + Rp.{{data.ongkir | number}} (Ongkir)</p>
+          <p *ngIf="data.type==='deposit'" style="color: var(--ion-color-medium-tint);">Permintaan deposit</p>
+        </ion-label>
+        <ion-note slot="end" style="text-align:right;">
+          <p *ngIf="data.total>=0" style="margin: 0;">Rp.{{data.total | number}}</p>
+          <p *ngIf="data.total<0" style="margin: 0;">-Rp.{{data.total * -1 | number}}</p>
+        </ion-note>
+      </ion-item>
+    </ion-list>
+
+    <ion-item *ngIf="pembayaran" color="light" lines="none">
+      <ion-label class="no-margin">
+        Total Biaya Keep:
+      </ion-label>
+      <ion-note slot="end" class="primary">Rp.{{belumDibayar(inv) | number}}</ion-note>
+    </ion-item>
+    <ion-item-divider *ngIf="!pembayaranVerified" color="light" style="text-align: center;padding:0 15px;border-bottom: none;" lines="none">
+      <span style="color: var(--ion-color-medium-tint);">
+        <p style="margin:0 0 10px;font-size: 12px;">
+          Perlu beberapa saat untuk mengkonfirmasi pembayaran kakak, mohon ditunggu ya kak :)
+        </p>
+      </span>
+    </ion-item-divider>
+    
+    <input style="display: none;" type="file" (change)="onFileSelect($event)" #fileButton />
+    <ion-img *ngIf="imgBukti" (click)="select()" [src]="imgBukti"></ion-img>
+  
+  </ion-list>
+
+</ion-content>
+
+<ion-footer *ngIf="pembayaranVerified && invoice && !invoice.biaya_dibayar && belumDibayar(invoice) > 0">
+  <ion-button *ngIf="pembayaran && !imgBukti" (click)="select()" expand="full" style="margin:0" color="primary">
+    UPLOAD BUKTI PEMBAYARAN
+  </ion-button>
+  <ion-button *ngIf="imgBukti" [disabled]="isUploading" (click)="uploadBukti()" expand="full" color="primary" style="margin:0">
+    KIRIM BUKTI&nbsp;<ion-spinner *ngIf="isUploading" name="dots"></ion-spinner>
+  </ion-button>
+</ion-footer>
+
+<ion-footer *ngIf="pembayaranVerified && invoice && !invoice.biaya_dibayar && belumDibayar(invoice) <= 0">
+  <ion-button *ngIf="belumDibayar(invoice) === 0" [disabled]="isUploading" (click)="ajukan('pelunasan')" expand="full" style="margin:0" color="primary">
+    AJUKAN PELUNASAN&nbsp;<ion-spinner *ngIf="isUploading" name="dots"></ion-spinner>
+  </ion-button>
+  <ion-button *ngIf="belumDibayar(invoice) < 0" [disabled]="isUploading" (click)="ajukan('deposit')" expand="full" color="primary" style="margin:0">
+    AJUKAN DEPOSIT&nbsp;<ion-spinner *ngIf="isUploading" name="dots"></ion-spinner>
+  </ion-button>
+</ion-footer>

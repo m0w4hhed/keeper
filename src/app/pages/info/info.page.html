@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar color="secondary" mode="ios">
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()" >
+        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Bantuan</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+	<ion-item-divider class="title">
+		<ion-icon name="code-working"></ion-icon>
+		Format Order Keeper:
+	</ion-item-divider>
+	<div>
+		<pre><b>Nama:</b> Nama Customer<br><b>Alamat:</b> Alamat rumah desa kelurahan jalan rt/rw nomor, <b>kec.</b>Kecamatan, <b>kab.</b>Kabupaten, Provinsi<br><b>HP:</b> 0812233445566<br><br>Pengirim: Dropshiper<br>081122334455<br><br><b>Keep</b><br>Nama Barang, Warna, Toko, Harga Beli, Jumlah Barang</pre>
+	</div>
+    <ion-item-divider color="grey">
+      <span style="color: var(--ion-color-medium-tint);">
+        <p style="margin: 5px;font-size: 12px;">
+          <ion-icon name="information-circle" color="medium" style="margin:2px;vertical-align: bottom;"></ion-icon>
+          &nbsp;Kata yg dicetak tebal wajib ada di format order, agar aplikasi dapat membaca data pesanan dengan benar (field Pengirim adalah dropshiper jika ada / opsional)
+        </p>
+      </span>
+    </ion-item-divider>
+
+	<ion-item-divider class="title">
+		<ion-icon name="information-circle"></ion-icon>
+		Informasi lainnya:
+	</ion-item-divider>
+	<ion-item button (click)="kontak('cs')" detail>
+		<ion-icon name="logo-whatsapp" color="success" style="padding-right: 7px;"></ion-icon>
+		<ion-label>Bantuan penggunaan aplikasi</ion-label>
+	</ion-item>
+	<ion-item button (click)="kontak('keeper')" detail>
+		<ion-icon name="logo-whatsapp" color="success" style="padding-right: 7px;"></ion-icon>
+		<ion-label>Kontak Agen Keeper</ion-label>
+	</ion-item>
+	<ion-item button (click)="kontak('admin')" detail>
+		<ion-icon name="logo-whatsapp" color="success" style="padding-right: 7px;"></ion-icon>
+		<ion-label>Kontak Admin Pembayaran</ion-label>
+	</ion-item>
+
+</ion-content>

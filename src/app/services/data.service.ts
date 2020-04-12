@@ -25,6 +25,29 @@ export class DataService {
     private afs: AngularFirestore,
   ) {
   }
+
+  async getTokoInfo(idToko: string) {
+    return (await this.afs.collection('configs').doc('user_config').collection('data_toko').doc(idToko).ref.get()).data() as DataToko;
+  }
+
+  async createInvoice({pesanan, ...inv}: Invoice) {
+    // console.log(inv, pesanan);
+    try {
+      const batch = this.afs.firestore.batch();
+      const keepRef = this.afs.collection('invoice').doc<Invoice>(inv.id).ref;
+      batch.set(keepRef, {
+        pesanan: pesanan.map(brg => brg.barcode),
+        ...inv
+      });
+      for (const item of pesanan) {
+        const ambilanRef = this.afs.collection('ambilan').doc<Ambilan>(item.barcode).ref;
+        batch.set(ambilanRef, item);
+      }
+      return batch.commit();
+    } catch (err) {
+      throw err;
+    }
+  }
   
   getDatas<T>(dbName: string, filter: Filter[], searchMode?: {field: string, search: string}|null, rangeDate?: {from: number, to: number, orderBy: string}|null): Observable<T[]> {
     return this.afs.collection<T>(dbName, ref => {
@@ -48,59 +71,19 @@ export class DataService {
   getData<T>(docPath: string): Observable<T> {
     return this.afs.doc<T>(docPath).valueChanges();
   }
-
-  async getTokoInfo(idToko: string) {
-    return (await this.afs.collection('configs').doc('user_config').collection('data_toko').doc(idToko).ref.get()).data() as DataToko;
+  setData(path: string, partialData: object) {
+    return this.afs.doc(path).set(partialData, {merge: true});
   }
-
-  async createInvoice(user: User, inv: Invoice) {
-    // console.log(inv);
-    try {
-      const batch = this.afs.firestore.batch();
-      const keepRef = this.afs.collection('invoice').doc<Invoice>(inv.id).ref;
-      batch.set(keepRef, {
-        active: true,
-        owner: user.uid,
-        id: inv.id,
-        berat: inv.berat,
-        cs: user.username,
-        penerima: inv.penerima,
-        pengirim: inv.pengirim,
-        pesanan: inv.pesanan.map(brg => ({barcode: brg.barcode})),
-        status: 'keep',
-        waktuOrder: inv.pesanan[0].waktuKeep,
-        diskon: 0,
-        dicek: false,
-        // subtotal: inv.total,
-        // kodeUnik: inv.kodeUnik,
-        // deposit: 0;
-        // tglDibayar: 0,
-        // waktuDibayar: number;
-        // waktuDicek: number;
-        // ekspedisi: Ekspedisi;
-      });
-      for (const item of inv.pesanan) {
-        const ambilanRef = this.afs.collection('ambilan').doc<Ambilan>(item.barcode).ref;
-        batch.set(ambilanRef, {
-          barcode: item.barcode,
-          nama: item.nama,         // nama
-          toko: item.toko,
-          warna: item.warna,
-          hargaBeli: item.hargaBeli,
-          waktuKeep: item.waktuKeep,
-          waktuPrint: 0,
-          penerima: inv.penerima.nama,
-          printed: false,
-          statusKeep: item.statusKeep         // (fullkeep/diambil/kosong)
-          // cs: string;
-          // pj: string;             // gudang
-          // wktScan: number;
-        });
+  setDatas(data: {path: string, partialData?: object, delete?: boolean}[]) {
+    const batch = this.afs.firestore.batch();
+    data.forEach(d => {
+      if (!d.delete) {
+        batch.set(this.afs.doc(d.path).ref, d.partialData, {merge: true});
+      } else {
+        batch.delete(this.afs.doc(d.path).ref);
       }
-      return batch.commit();
-    } catch (err) {
-      throw err;
-    }
+    });
+    return batch.commit()
   }
 
 }

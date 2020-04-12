@@ -3,17 +3,17 @@ import { Component, ViewChild } from '@angular/core';
 import { Invoice } from 'src/app/services/interfaces/invoice';
 import { Kecamatan } from 'src/app/services/interfaces/ongkir';
 import { UserService } from 'src/app/services/user.service';
+import { DataService } from 'src/app/services/data.service';
 import { ToolService } from 'src/app/services/tool.service';
 import { EkspedisiService } from 'src/app/services/ekspedisi.service';
 import { ModalController, Platform, IonInput } from '@ionic/angular';
 import { VerifikasiInputPage } from 'src/app/pages/verifikasi-input/verifikasi-input.page';
 import { User } from 'src/app/services/interfaces/user.config';
-import { SwitcherService } from 'src/app/services/switcher.service';
 import { EditInvoicePage } from 'src/app/pages/invoice/edit-invoice/edit-invoice.page';
+import { SwitcherService } from 'src/app/services/switcher.service';
 import { ListTokoPage } from 'src/app/pages/list-toko/list-toko.page';
 import { EditInvoiceTrialPage } from 'src/app/pages/invoice/edit-invoice-trial/edit-invoice-trial.page';
-// import { ListTokoPage } from 'src/app/pages/list-toko/list-toko.page';
-// import { EditInvoiceTrialPage } from 'src/app/pages/invoice/edit-invoice-trial/edit-invoice-trial.page';
+import { InfoPage } from 'src/app/pages/info/info.page';
 
 @Component({
   selector: 'app-keep',
@@ -35,9 +35,10 @@ export class KeepPage {
   listKecamatan: Kecamatan[];
   kecamatan: Kecamatan;
 
-  @ViewChild('inputan', {static: false}) inputArea: IonInput;
+  @ViewChild('inputan', {static: false}) inputArea;
 
   constructor(
+    private dataService: DataService,
     public userService: UserService,
     public switcher: SwitcherService,
     public tool: ToolService,
@@ -53,13 +54,17 @@ export class KeepPage {
           this.task2 = this.switcher.getInvoices(user).subscribe(
             (res: Invoice[]) => {
               this.invoices = res;
-              // console.log(res);
+              this.onload = false;
+              console.log(res);
             },
-            err => console.log(err)
-          );
+            err => {
+              console.log(err);
+              this.onload = false;
+            }
+          )
         });
       }
-    });
+    })
   }
 
   openInput() {
@@ -80,8 +85,12 @@ export class KeepPage {
     });
     return await modal.present();
   }
-  help() {
-    this.popup.showAd('https://images.wallpaperscraft.com/image/kitten_tabby_cat_lying_legs_muzzle_whiskers_78459_800x1200.jpg')
+  async help() {
+    const helpModal = await this.modalCtrl.create({
+      component: InfoPage
+    });
+    return await helpModal.present();
+    // this.popup.showAd('https://images.wallpaperscraft.com/image/kitten_tabby_cat_lying_legs_muzzle_whiskers_78459_800x1200.jpg')
   }
 
   baca(input: string) {
@@ -95,6 +104,7 @@ export class KeepPage {
         const result = this.tool.baca(input, this.user);
         if (result.error) {
           this.error = result.error;
+          if (this.error.match(/toko/gi)) { this.actionOnError = true; }
         } else {
           this.inputOrder = result.data;
           const kec = this.inputOrder.penerima.kec;
@@ -108,13 +118,16 @@ export class KeepPage {
   }
   pilih(kec: Kecamatan) {
     this.kecamatan = kec;
+    this.inputOrder.penerima.kec = kec.subdistrict_name;
     this.inputOrder.penerima.kec_id = kec.subdistrict_id;
     this.inputOrder.penerima.kab = kec.city;
     this.inputOrder.penerima.kab_id = kec.city_id;
     this.inputOrder.penerima.prov = kec.province;
     this.inputOrder.penerima.prov_id = kec.province_id;
+    console.log(kec);
   }
   async submit(inputOrder: Invoice, user: User) {
+    console.log(inputOrder);
     inputOrder.owner = user.uid;
     inputOrder.cs = user.username;
     if (!inputOrder.pengirim.nama) {

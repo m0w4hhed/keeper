@@ -17,7 +17,6 @@ export interface Invoice {
     waktuDicek?: number;
     resi?: string;
     printed: boolean;
-    biaya_keep: number;
     biaya_dibayar: boolean;
 }
 export interface Ambilan {

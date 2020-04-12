@@ -1,0 +1,133 @@
+<ion-header>
+  <ion-toolbar mode="ios" color="primary">
+    <ion-title>
+      EKSPEDISI
+    </ion-title>
+    <ion-buttons slot="start">
+      <ion-button color="light" (click)="dismiss()">
+        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+      </ion-button>
+    </ion-buttons> 
+  </ion-toolbar>
+  <ion-toolbar color="primary">
+      <ion-list class="ion-no-padding">
+        <ion-item color="primary">
+          <ion-avatar slot="start" style="margin:0;">
+            <ion-icon name="airplane" size="large" color="light" style="margin: 5px 10px 15px 0; transform: rotate(45deg) scale(1.3);"></ion-icon>
+          </ion-avatar>
+          <ion-label color="light">
+            <h2><strong>{{ invoice.penerima.nama | uppercase }}</strong> ({{ berat | number }}gr) </h2>
+            <h3>ke {{ invoice.penerima.kec | uppercase }}, {{ invoice.penerima.kab | uppercase }}</h3>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="grey">
+  <ion-item-divider class="title" sticky>
+    <ion-icon name="search" color="primary"></ion-icon>
+    <b>PILIH EKSPEDISI</b>
+  </ion-item-divider>
+  <ion-list class="divided">
+    <ion-item button [detail]="(ekspedisiCustom.ongkir!==0)?false:true" *ngIf="!isOnCustom" (click)="isOnCustom = true">
+      <ion-label>
+        <h2>
+          <span *ngIf="ekspedisiCustom.ongkir===0">CUSTOM EKSPEDISI</span><strong>{{ ekspedisiCustom.kurir | uppercase }}</strong>
+          <ion-icon *ngIf="ekspedisiCustom.kurir===ekspedisiPilihan?.kurir&&ekspedisiCustom.service===ekspedisiPilihan?.service" name="checkmark-circle" color="primary"></ion-icon>
+        </h2>
+        <p *ngIf="!customResi">Estimasi: ? Hari</p>
+        <p *ngIf="customResi">Resi: {{customResi | uppercase }}</p>
+      </ion-label>
+      <ion-note *ngIf="ekspedisiCustom.ongkir !== 0">
+        <h5 style="color: #bb0303">
+          <strong>Rp.{{ ekspedisiCustom.ongkir | number }}</strong>
+        </h5>
+      </ion-note>
+    </ion-item>
+    <ion-item *ngIf="isOnCustom">
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <ion-col size="6" class="ion-no-padding">
+            <ion-label position="floating">Ekspedisi:</ion-label>
+            <ion-input [(ngModel)]="ekspedisiCustom.kurir"></ion-input>
+          </ion-col>
+          <ion-col size="6" class="ion-no-padding">
+            <ion-label position="floating">Ongkir:</ion-label>
+            <ion-input [(ngModel)]="ekspedisiCustom.ongkir" type="number"></ion-input>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="6" class="ion-no-padding">
+            <ion-label position="floating">Service:</ion-label>
+            <ion-input [(ngModel)]="ekspedisiCustom.service"></ion-input>
+          </ion-col>
+          <ion-col size="6" class="ion-no-padding">
+            <ion-label position="floating">Resi (opsional):</ion-label>
+            <ion-input [(ngModel)]="customResi"></ion-input>
+          </ion-col>
+        </ion-row>   
+      </ion-grid>
+      <ion-button slot="end" #btn (click)="customEkspedisi()" color="primary" style="margin-right: -10px;">
+        <ion-label style="text-align: center;">SIMPAN</ion-label>
+      </ion-button>
+    </ion-item>
+    <ion-item *ngIf="cod as eksp" button (click)="pilihEkspedisi(eksp)" lines="none">
+      <ion-ripple-effect></ion-ripple-effect>
+      <ion-label>
+        <h2>
+          <strong>{{ eksp.kurir | uppercase }}</strong>  {{ eksp.service | uppercase }}
+          <ion-icon *ngIf="eksp.kurir===ekspedisiPilihan?.kurir&&eksp.service===ekspedisiPilihan?.service" name="checkmark-circle" color="primary"></ion-icon>
+        </h2>
+        <p>Cash On Delivery</p>
+      </ion-label>
+      <ion-note>
+        <h5 style="color: #bb0303">
+          <strong>Rp{{ eksp.ongkir | number }}</strong>
+        </h5>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="onload" class="ion-no-padding">
+    <ion-item lines="full" *ngFor="let a of [1,2,3,4,5,6,7]">
+      <ion-label>
+        <h2><ion-skeleton-text animated style="width: 60%;height: 18px"></ion-skeleton-text></h2>
+        <p><ion-skeleton-text animated style="width: 40%"></ion-skeleton-text></p>
+      </ion-label>
+      <ion-note>
+        <h5 style="color: #bb0303">
+          <strong><ion-skeleton-text animated style="width: 75px;height: 20px;"></ion-skeleton-text></strong>
+        </h5>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="ongkirList && !onload" class="ion-no-padding">
+    <ion-item button (click)="pilihEkspedisi(eksp)" *ngFor="let eksp of ongkirList | orderBy:'ongkir'">
+      <ion-ripple-effect></ion-ripple-effect>
+      <ion-label>
+        <h2>
+          <strong>{{ eksp?.kurir | uppercase }}</strong>  {{ eksp?.service | uppercase }}
+          <ion-icon *ngIf="eksp?.kurir===ekspedisiPilihan?.kurir&&eksp?.service===ekspedisiPilihan?.service" name="checkmark-circle" color="primary"></ion-icon>
+        </h2>
+        <p *ngIf="eksp.estimasi">Estimasi: {{ eksp?.estimasi }} Hari</p>
+        <p *ngIf="!eksp.estimasi">Estimasi: 2-4 Hari</p>
+      </ion-label>
+      <ion-note>
+        <h5 style="color: #bb0303">
+          <strong>Rp{{ eksp?.ongkir | number }}</strong>
+        </h5>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+
+</ion-content>
+
+<ion-footer *ngIf="ekspedisiPilihan" mode="ios">
+  <ion-item [disabled]="isProcessing" button color="primary" (click)="pilih()">
+    <ion-label style="text-align: center;">
+      PILIH <b>{{ ekspedisiPilihan.kurir | uppercase }}</b> {{ ekspedisiPilihan.service | uppercase }} <b>Rp.{{ ekspedisiPilihan.ongkir | number }}</b>
+    </ion-label>
+  </ion-item>
+</ion-footer>

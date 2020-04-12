@@ -6,8 +6,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ionic serve --devapp --address=0.0.0.0",
-    "device": "ionic cordova run android --device --prod --release -- -- --keystore=..\\mi-apps.keystore --alias=mi-apps",
-    "build": "ionic cordova resources android && ionic cordova build android --prod --release && copy /Y platforms\\android\\app\\build\\outputs\\apk\\release\\app-release-unsigned.apk ..\\keeper.apk && jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ..\\mi-apps.keystore ..\\keeper.apk mi-apps && zipalign -v 4 ..\\keeper.apk ..\\keeper-aligned.apk",
+    "device": "ionic cordova run android --device --prod --release -- -- --keystore=..\\mi-apps.keystore --alias=mi-apps --storePassword=m0w4hhed --password=m0w4hhed",
+    "build": "ionic cordova resources android && ionic cordova build android --prod --release && copy /Y platforms\\android\\app\\build\\outputs\\apk\\release\\app-release-unsigned.apk ..\\keeper.apk && jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ..\\mi-apps.keystore ..\\keeper.apk mi-apps && zipalign -v 4 ..\\keeper.apk ..\\keeper.v..apk",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -80,12 +80,14 @@
     "protractor": "~5.4.0",
     "ts-node": "~7.0.0",
     "tslint": "~5.15.0",
-    "typescript": "~3.4.3"
+    "typescript": "^3.4.5"
   },
   "description": "An Ionic project",
   "cordova": {
     "plugins": {
-      "cordova-plugin-googleplus": {},
+      "cordova-plugin-googleplus": {
+        "PLAY_SERVICES_VERSION": "15.0.1"
+      },
       "cordova-plugin-inappbrowser": {},
       "cordova-plugin-whitelist": {},
       "cordova-plugin-statusbar": {},

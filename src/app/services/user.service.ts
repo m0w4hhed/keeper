@@ -89,7 +89,7 @@ export class UserService {
       if (!registered) {
         if (!displayName) { displayName = ''; }
         const data = { uid, email, displayName, photoURL, activated: false, deposit: 0 } as User;
-        // this.gql.sendNotification('NEW KEEPER MEMBER!', `${data.email} (${data.displayName}) telah bergabung!`, 'pendaftaran_keeper');
+        this.gql.sendNotification('NEW KEEPER MEMBER!', `${data.email} (${data.displayName}) telah bergabung!`, 'pendaftaran_keeper');
         return userRef.set(data).then(() => { return data; }, (err) => { throw err; });
       }
     } catch (err) { throw err; }

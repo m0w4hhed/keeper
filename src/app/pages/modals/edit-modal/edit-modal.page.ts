@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { ToolService } from 'src/app/services/tool.service';
 
@@ -11,20 +11,19 @@ export class EditModalPage implements OnInit {
 
   title: string;
   data: any[];
+  functions;
 
   constructor(
     private modalCtrl: ModalController,
     public tool: ToolService,
-  ) { }
-
-  ngOnInit() {
+  ) {
   }
+  ngOnInit() {}
 
-  dismiss(rawData?) {
-    if (rawData) {
-      const data = Object.assign({}, ...rawData.map(d => ({ [d.key]: d.value })));
-      this.modalCtrl.dismiss(data);
-    } else { this.modalCtrl.dismiss(); }
+  ok() {
+    const data = Object.assign({}, ...this.data.map(d => ({ [d.key]: d.value })));
+    this.functions.onSubmitFunction(data);
+    this.modalCtrl.dismiss();
   }
 
 }

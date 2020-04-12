@@ -3,6 +3,7 @@ import { UserService } from 'src/app/services/user.service';
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 import { Invoice, Penerima, Pengirim, Ambilan } from './interfaces/invoice';
+import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 // import { Clipboard } from '@ionic-native/clipboard/ngx';
 // import { AppVersion } from '@ionic-native/app-version/ngx';
 
@@ -13,6 +14,7 @@ export class ToolService {
 
   constructor(
     private userService: UserService,
+    private iab: InAppBrowser,
     // private clipboard: Clipboard,
     // private appVersion: AppVersion,
   ) {}
@@ -156,7 +158,6 @@ export class ToolService {
     });
     return {error, listBarang};
   }
-
   hitungBerat(nama: string) {
     const USER_CONFIG = this.userService.user_config$.value;
     let berat = 500; // default berat 500gr
@@ -252,7 +253,7 @@ export class ToolService {
     });
     if (margin < 0) { margin = 0; }
     if (invoice.ekspedisi) {
-      biayaKeep += invoice.ekspedisi.ongkir;
+      // biayaKeep += invoice.ekspedisi.ongkir;
     } else { biayaKeep = 0; }
     return { biayaKeep, subtotalBarang, belumTotalan, beratPaket, margin };
   }
@@ -260,9 +261,11 @@ export class ToolService {
   cssBarang(barang: Ambilan) {
     let icon = 'search-circle';
     let color = 'dark';
-    if (barang.statusKeep === 'kosong') { icon = 'close-circle'; color = 'danger'; }
-    if (barang.printed) { icon = 'print'; color = 'tertiary'; }
-    if (barang.statusKeep === 'diambil') { icon = 'checkmark-circle'; color = 'success'; }
+    if (barang) {
+      if (barang.statusKeep === 'kosong') { icon = 'close-circle'; color = 'danger'; }
+      if (barang.printed) { icon = 'print'; color = 'tertiary'; }
+      if (barang.statusKeep === 'diambil') { icon = 'checkmark-circle'; color = 'success'; }
+    }
     return { icon, color }
   }
   
@@ -282,6 +285,18 @@ export class ToolService {
     const re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
     // tslint:disable-next-line: no-bitwise
     return nominal.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+  }
+
+  kontak(type: string) {
+    let phone = '', text = '';
+    const { wa_admin, wa_cs, wa_keeper } = this.userService.user_config$.value;
+    if (type === 'cs') { phone = wa_cs.toString(); text = 'Hai kak, mau tanya aplikasi dong'; }
+    if (type === 'admin') { phone = wa_admin.toString(); text = 'Hai kak admin, mau tanya pembayaran dong'; }
+    if (type === 'keeper') { phone = wa_keeper.toString(); text = 'Hai kak keeper, mau tanya barang dong'; }
+    this.iab.create(`https://api.whatsapp.com/send?phone=${phone}&text=${text}`, '_system');
+  }
+  wa(phone: string, text: string) {
+    this.iab.create(`https://api.whatsapp.com/send?phone=${phone}&text=${text}`, '_system');
   }
 
   // getApp() {

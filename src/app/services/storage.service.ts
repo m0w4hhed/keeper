@@ -112,8 +112,8 @@ export class StorageService {
     console.log('[INV] Delete: ', invoice);
     try {
       const delInvoice = this.deleteArray('invoice', 'id', invoice.id);
-      const delAmbilan = this.deleteArray('ambilan', 'barcode', invoice.pesanan.map(x => x.barcode));
-      return Promise.all([delInvoice, delAmbilan]);
+      this.deleteArray('ambilan', 'barcode', invoice.pesanan.map(x => x.barcode));
+      return delInvoice;
     } catch (err) { throw err; }
   }
 }

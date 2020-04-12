@@ -38,7 +38,27 @@ const routes: Routes = [
   {
     path: 'edit-invoice-trial',
     loadChildren: () => import('./pages/invoice/edit-invoice-trial/edit-invoice-trial.module').then( m => m.EditInvoiceTrialPageModule)
+  },  {
+    path: 'biaya-keep',
+    loadChildren: () => import('./pages/invoice/biaya-keep/biaya-keep.module').then( m => m.BiayaKeepPageModule)
+  },
+  {
+    path: 'edit-penerima',
+    loadChildren: () => import('./pages/invoice/edit-penerima/edit-penerima.module').then( m => m.EditPenerimaPageModule)
+  },
+  {
+    path: 'totalan',
+    loadChildren: () => import('./pages/invoice/totalan/totalan.module').then( m => m.TotalanPageModule)
+  },
+  {
+    path: 'info',
+    loadChildren: () => import('./pages/info/info.module').then( m => m.InfoPageModule)
+  },
+  {
+    path: 'ekspedisi',
+    loadChildren: () => import('./services/ekspedisi/ekspedisi.module').then( m => m.EkspedisiPageModule)
   }
+
 
 ];
 @NgModule({

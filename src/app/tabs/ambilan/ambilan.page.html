@@ -1,14 +1,43 @@
-<ion-content color="light" [fullscreen]="true" *ngIf="userService.user$ | async as user">
-  <ion-list class="ion-no-padding" *ngFor="let data of switcher.getAmbilan(user) | async | groupBy:'toko' | keyvalue">
-    <ion-item-divider color="primary" sticky>{{data.key.toUpperCase()}}</ion-item-divider>
-    <ion-item color="light" *ngFor="let barang of data.value">
+<ion-content color="light" [fullscreen]="true" *ngIf="ambilan">
+
+  <ion-list *ngIf="onload" class="ion-no-padding">
+    <ion-item lines="full" *ngFor="let a of [1,2,3,4,5,6,7]">
       <ion-label>
-        <p class="text-secondary" style="font-size: 10px;">{{barang.penerima.toUpperCase()}}</p>
+        <h2><ion-skeleton-text animated style="width: 60%;height: 18px"></ion-skeleton-text></h2>
+        <p><ion-skeleton-text animated style="width: 40%"></ion-skeleton-text></p>
+      </ion-label>
+      <ion-note>
+        <h5 style="color: #bb0303">
+          <strong><ion-skeleton-text animated style="width: 75px;height: 20px;"></ion-skeleton-text></strong>
+        </h5>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+  <ion-list *ngIf="!onload && ambilan.length === 0" class="ion-no-padding">
+    <div class="image-holder">
+      <img src="assets/img/box-empty.svg" />
+      <ion-label>Belum ada pesanan</ion-label>
+    </div>
+  </ion-list>
+
+  <ion-list class="ion-no-padding" *ngFor="let data of ambilan | groupBy:groupBy | keyvalue">
+    <ion-item-divider color="primary" sticky>{{data.key.toUpperCase()}}</ion-item-divider>
+    <ion-item *ngFor="let barang of data.value" color="light" class="no-margin">
+      <ion-label>
         <h4>{{tool.titleCase(barang.nama)}} {{tool.titleCase(barang.warna)}}</h4>
+        <p *ngIf="groupBy==='toko'" class="text-secondary note">{{barang.penerima.toUpperCase()}}</p>
+        <p *ngIf="groupBy==='penerima'" class="text-secondary note">{{barang.toko.toUpperCase()}}</p>
       </ion-label>
       <ion-chip slot="end" color="dark">
         {{barang.statusKeep.toUpperCase()}}
       </ion-chip>
     </ion-item>
   </ion-list>
+
 </ion-content>
+
+<ion-footer>
+  <ion-button fill="clear" color="dark" style="margin-left: 0;">FILTER:</ion-button>
+  <ion-button [fill]="groupBy==='toko'?'outline':'clear'" (click)="groupBy='toko'" [color]="groupBy==='toko'?'primary':'dark'">PER-TOKO</ion-button>
+  <ion-button [fill]="groupBy==='penerima'?'outline':'clear'" (click)="groupBy='penerima'" [color]="groupBy==='penerima'?'primary':'dark'">PER-CUST</ion-button>
+</ion-footer>

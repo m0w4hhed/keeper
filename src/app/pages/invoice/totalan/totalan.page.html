@@ -1,0 +1,109 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-title>
+      Totalan Harga Jual
+    </ion-title>
+    <ion-buttons slot="start">
+      <ion-button color="dark" (click)="dismiss()">
+        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+      </ion-button>
+    </ion-buttons> 
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="invoice as inv" color="grey">
+
+  <ion-list class="divided">
+    <ion-item-divider color="grey">
+      <span style="margin:0 auto;color: var(--ion-color-medium-tint);">
+        <p style="margin: 5px;font-size: 12px;">
+          TETAPKAN HARGA JUAL DARI TIAP BARANG<br>
+          atau <span class="link" (click)="update('updateMassal')">tambahkan laba barang secara massal</span>
+        </p>
+      </span>
+    </ion-item-divider>
+
+    <ion-item button (click)="update('hargaJual', i)" *ngFor="let item of inv.pesanan; let i = index" color="light" [lines]="(inv.pesanan.length===(i+1))?'':'none'">
+      <ion-label class="no-margin">
+        <strong> {{tool.titleCase(item.nama)}} </strong> {{tool.titleCase(item.warna)}}
+        <br>
+        <p class="note">
+          {{item.toko.toUpperCase()}} | ±{{item.berat | number}} gr | Rp.{{item.hargaBeli | number}}
+        </p>
+      </ion-label>
+      <ion-note slot="end" style="padding: 8px 0;">
+        <p>Rp.{{item.hargaJual | number}}</p>
+      </ion-note>
+    </ion-item>
+
+    <ion-item color="light" lines="none">
+      <ion-label class="no-margin">
+        Subtotal:
+        <p class="note">±{{olahPesanan(inv).beratPaket | number}}gr | Rp.{{(inv.pesanan | pluck:'hargaBeli' | sum) | number}}</p>
+      </ion-label>
+      <ion-note slot="end">
+        <p><strong>Rp.{{olahPesanan(inv).subtotalBarang | number}}</strong></p>
+      </ion-note>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label class="no-margin">
+        <b>{{inv.ekspedisi.kurir.toUpperCase()}}</b> {{inv.ekspedisi.service.toUpperCase()}} (±{{olahPesanan(inv).beratPaket / 1000 | number}}Kg)
+      </ion-label>
+      <ion-note slot="end">Rp.{{inv.ekspedisi.ongkir | number}}</ion-note>
+    </ion-item>
+
+    <ion-item button (click)="update('diskon')" color="light">
+      <ion-label class="no-margin">
+        Diskon:
+      </ion-label>
+      <ion-note slot="end" class="primary">-Rp.{{inv.diskon | number}}</ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="!olahPesanan(inv).belumTotalan" lines="full">
+      <ion-label class="no-margin">
+        <b>Total</b>
+      </ion-label>
+      <ion-note slot="end">
+        <b>Rp.{{olahPesanan(inv).subtotalBarang + inv.ekspedisi.ongkir - inv.diskon | number}}</b></ion-note>
+    </ion-item>
+
+    <ion-item-divider *ngIf="!olahPesanan(inv).belumTotalan" color="grey">
+      <span style="color: var(--ion-color-medium-tint);">
+        <p style="margin: 5px;font-size: 12px;">
+          <ion-icon name="information-circle" color="medium" style="margin:2px;vertical-align: bottom;"></ion-icon>
+          &nbsp;Total diatas adalah total tagihan yang akan dibayarkan oleh customer ke rekening kakak
+        </p>
+      </span>
+    </ion-item-divider>
+
+  </ion-list>
+
+  <ion-list class="ion-no-padding">
+    
+    <ion-item color="primary-light" lines="none">
+      <ion-label color="primary" class="no-margin">
+        Biaya Keep:
+        <ion-icon name="information-circle-outline" color="primary" style="margin: -1px;"></ion-icon>
+      </ion-label>
+      <ion-note class="primary" slot="end">Rp.{{olahPesanan(inv).biayaKeep + inv.ekspedisi.ongkir | number}}</ion-note>
+    </ion-item>
+  
+    <ion-item color="light" lines="none">
+      <ion-label color="success" class="no-margin">
+        Keuntungan:
+        <p class="note">Laba yg kakak peroleh</p>
+      </ion-label>
+      <ion-note slot="end" class="success">
+        <p style="margin: 0;"><strong>Rp.{{olahPesanan(inv).margin - inv.diskon | number}}</strong></p>
+      </ion-note>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-button [disabled]="olahPesanan(inv).belumTotalan || onProcess" expand="block" color="primary"
+  (click)="totalan()" style="margin: 5px;">
+    Update Totalan&nbsp;<ion-spinner *ngIf="onProcess" name="dots"></ion-spinner>
+  </ion-button>
+
+</ion-content>

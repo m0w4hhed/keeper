@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { Invoice, Penerima, Pengirim } from 'src/app/services/interfaces/invoice';
+import { Invoice, Penerima, Pengirim, Ambilan } from 'src/app/services/interfaces/invoice';
+import { Kecamatan } from 'src/app/services/interfaces/ongkir';
 import { User } from 'src/app/services/interfaces/user.config';
 import { ModalController } from '@ionic/angular';
 import { ToolService } from 'src/app/services/tool.service';
 import { UserService } from 'src/app/services/user.service';
+import { DataService } from 'src/app/services/data.service';
 import { PopupService } from 'src/app/services/popup.service';
+import { StorageService } from 'src/app/services/storage.service';
 import { SwitcherService } from 'src/app/services/switcher.service';
 import { Observable } from 'rxjs';
 import { EditModalPage } from '../../modals/edit-modal/edit-modal.page';
@@ -51,6 +54,9 @@ export class EditInvoiceTrialPage implements OnInit {
       }
     );
   }
+  
+  olahPesanan(invoice: Invoice) { return this.tool.olahPesanan(invoice); }
+  cssBarang(barang: Ambilan) { return this.tool.cssBarang(barang); }
 
   dismiss() {
     this.modalCtrl.dismiss();

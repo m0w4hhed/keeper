@@ -18,12 +18,11 @@ export class SwitcherService {
 
   createInvoice(user: User, invoice: Invoice) {
     if (user.activated) {
-      return this.data.createInvoice(user, invoice)
+      return this.data.createInvoice(invoice)
     } else {
       return this.storage.createInvoice(invoice);
     }
   }
-
   getInvoice(user: User, invoiceID: string): Observable<Invoice> {
     if (user.activated) {
       return this.data.getData<Invoice>(`invoice/${invoiceID}`).pipe(
@@ -67,22 +66,29 @@ export class SwitcherService {
           if (!data.length) {return combineLatest([of([] as Invoice[]), of([] as Ambilan[])]); }
           return combineLatest([
             of(data),
-            combineLatest(
-              allBarcode.map(barcode => {
-                return this.data.getData<Ambilan>(`ambilan/${barcode}`);
-              })
-            )
+            this.data.getData<Ambilan>(`ambilan/${allBarcode[0]}`)
+            // combineLatest(
+            //   allBarcode.map(barcode => {
+            //     return this.data.getData<Ambilan>(`ambilan/${barcode}`);
+            //   })
+            // )
           ]);
         }),
-        map( ([data, allBarcode]: [Invoice[], Ambilan[]]) => {
+        // map( ([data, allBarcode]: [Invoice[], Ambilan[]]) => {
+        map( ([data, allBarcode]: [Invoice[], Ambilan]) => {
           // console.log(data, allBarcode);
           return data.map(({pesanan, ...inv}) => {
             return {
               ...inv,        // as unknown as string[] is a new method
               pesanan: (pesanan as unknown as string[]).map(d => {
-                allBarcode = allBarcode.filter(brg => brg);
-                return allBarcode.find(x => x.barcode === d); // .find(x => x.barcode === d.barcode);
+                if (d === allBarcode.barcode) {
+                  return allBarcode;
+                } else { return d; }
               })
+              // pesanan: (pesanan as unknown as string[]).map(d => {
+              //   allBarcode = allBarcode.filter(brg => brg);
+              //   return allBarcode.find(x => x.barcode === d); // .find(x => x.barcode === d.barcode);
+              // })
             };
           });
         })
@@ -92,8 +98,14 @@ export class SwitcherService {
     }
   }
 
-  getAmbilan(user: User, barcode: string): Observable<Ambilan[]> | Observable<Ambilan> {
+  getAmbilan(user: User, barcode?: string): Observable<Ambilan[]> | Observable<Ambilan> {
     if (user.activated) {
+      return barcode ?
+        this.data.getData<Ambilan>(`ambilan/${barcode}`) :
+        this.data.getDatas<Ambilan>('ambilan', [
+          {field: 'owner', comp: '==', value: user.uid},
+          {field: 'statusKeep', comp: '==', value: 'keep'}
+        ]);
     } else {
       return barcode ? this.storage.getAmbilan(barcode) : this.storage.getAmbilan();
     }
@@ -101,6 +113,11 @@ export class SwitcherService {
 
   deleteInvoice(user: User, invoice: Invoice) {
     if (user.activated) {
+      const delData = [{ path: `invoice/${invoice.id}`, delete: true}];
+      invoice.pesanan.forEach(barang => {
+        delData.push({ path: `ambilan/${barang.barcode}`, delete: true });
+      });
+      return this.data.setDatas(delData)
     } else {
       return this.storage.deleteInvoice(invoice);
     }

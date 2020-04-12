@@ -1,4 +1,4 @@
-<ion-header *ngIf="invoice | async as inv">
+<ion-header *ngIf="(invoice | async) as inv">
   <ion-toolbar color="secondary" mode="ios">
     <ion-buttons mode="md" slot="start">
       <ion-button (click)="dismiss()" >
@@ -6,7 +6,7 @@
       </ion-button>
     </ion-buttons>
     <ion-title>Informasi Invoice</ion-title>
-    <ion-buttons slot="end">
+    <ion-buttons mode="md" slot="end">
       <ion-button (click)="delete(user, inv)" >
         <ion-icon slot="icon-only" name="trash"></ion-icon>
       </ion-button>
@@ -14,79 +14,87 @@
   </ion-toolbar>
   <ion-toolbar style="padding: 0 15px;" color="secondary">
     <p>
-      <span class="title">Invoice</span> <br>
-      <span class="titleName">#{{inv.id}}</span>
+      <span class="toolbar-title">Invoice</span> <br>
+      <span class="toolbar-note">#{{inv.id}}</span>
     </p>
     <p slot="end" style="text-align: right;">
-      <span class="title">Tanggal</span> <br>
-      <span class="titleName">{{(inv.waktuOrder*1000) | date:'dd/MM/yyyy'}}</span>
+      <span class="toolbar-title">Tanggal</span> <br>
+      <span class="toolbar-note">{{(inv.waktuOrder*1000) | date:'dd/MM/yyyy'}}</span>
     </p>
   </ion-toolbar>
 </ion-header>
 
-<ion-content color="light" *ngIf="invoice | async as inv">
-  <ion-item button color="light" lines="none" style="height:auto;">
-    <ion-icon class="avatar" name="navigate-circle" slot="start"></ion-icon>
-    <ion-label style="white-space: inherit;">
-      <b>{{inv.penerima.nama.toUpperCase()}}</b>
-      <p>+{{inv.penerima.hp}}</p>
-      <span class="note" style="font-size: 15px;">
-        {{tool.titleCase(inv.penerima.alamat)}},
-        Kec. {{tool.titleCase(inv.penerima.kec)}},&nbsp;
-        Kab. {{inv.penerima.kab}},&nbsp;
-        Prov. {{inv.penerima.prov}}
-      </span>
-    </ion-label>
-  </ion-item>
-  <ion-item button color="light" lines="full" style="height:auto;">
-    <ion-ripple-effect></ion-ripple-effect>
-    <ion-icon class="avatar" name="gift" slot="start"></ion-icon>
-    <p style="margin: 5px 0 10px;">
-      <span class="title" style="color: var(--ion-color-primary);">Pengirim</span> <br>
-      <span class="titleName">{{inv.pengirim.nama.toUpperCase()}} | +{{inv.pengirim.hp}}</span> <br>
-    </p>
-  </ion-item>
-  <ion-list style="padding:0" color="light">
-    <ion-item-divider color="light" style="border-bottom: none;margin-top: 8px;color: var(--ion-color-primary);">
-      <p style="color: var(--ion-color-primary);">Barang</p>
-      <p slot="end" style="margin-right: 17px;color: var(--ion-color-primary);">Harga Beli</p>
-    </ion-item-divider>
-    <ion-item button *ngFor="let item of inv.pesanan; let i = index" color="light" [lines]="(inv.pesanan.length===(i+1))?'':'none'">
-      <ion-ripple-effect></ion-ripple-effect>
+<ion-content *ngIf="(invoice | async) as inv" color="grey">
+
+  <ion-list class="divided">
+    <ion-item button color="light" lines="none" style="height:auto;font-size:14px">
+      <ion-icon class="avatar" name="navigate-circle" slot="start"></ion-icon>
       <ion-label>
-        <strong> {{tool.titleCase(item.nama)}} </strong> {{tool.titleCase(item.warna)}}
-        <p class="note">
-          {{item.toko.toUpperCase()}} | {{item.berat}} gram
-        </p>
+        <b>{{inv.penerima.nama.toUpperCase()}}</b><br>
+        <span>
+          +{{inv.penerima.hp}}<br>
+          {{tool.titleCase(inv.penerima.alamat)}},<br>
+          Kec.{{tool.titleCase(inv.penerima.kec)}},<br>
+          Kab.{{inv.penerima.kab}},<br>
+          Prov.{{inv.penerima.prov}}
+        </span>
       </ion-label>
-      <ion-note slot="end"><b>Rp.{{item.hargaBeli | number}}</b></ion-note>
     </ion-item>
-    <ion-item color="light" lines="none" class="align-right">
-      <ion-label><b>Subtotal:</b></ion-label>
-      <ion-note slot="end"><strong>Rp.{{(inv.pesanan | pluck:'hargaBeli' | sum) | number}}</strong></ion-note>
-    </ion-item>
-    <ion-item color="light" lines="none" class="align-right">
-      <ion-label>Biaya Keep:</ion-label>
-      <ion-note slot="end">Rp.{{inv.pesanan | pluck:'biaya_keep' | sum | number}}</ion-note>
-    </ion-item>
-    <!-- <ion-item color="light" lines="none">
-      <ion-label>Kode Unik:</ion-label>
-      <ion-note slot="end" style="font-size: 15px; padding: 14px 0 14px 16px;color: var(--ion-color-dark);">Rp.{{inv.kodeUnik | number}}</ion-note>
-    </ion-item> -->
-    <ion-item button color="light" lines="none" class="align-right" (click)="isAddDiskon=true">
+    <ion-item button color="light" lines="none" style="height:auto;">
+      <ion-icon class="avatar" name="gift" slot="start"></ion-icon>
       <ion-label>
-        Diskon:
-        <span class="note" *ngIf="!isAddDiskon">(ketuk edit)</span>
+        <p style="color: var(--ion-color-primary);">Pengirim</p>
+        <p><b>{{inv.pengirim.nama.toUpperCase()}}</b> | +{{inv.pengirim.hp}}</p>
       </ion-label>
-      <ion-input *ngIf="isAddDiskon" [(ngModel)]="inv.diskon" type="number" class="primary"></ion-input>
-      <ion-note *ngIf="!isAddDiskon" slot="end" class="primary">-Rp.{{inv.diskon | number}}</ion-note>
-    </ion-item>
-    <ion-item button color="light" lines="none" detail>
-      <ion-label>Pilih Ekspedisi</ion-label>
-    </ion-item>
-    <ion-item color="light" lines="none">
-      <ion-label color="primary" style="font-size: 18px;"><b>Total:</b></ion-label>
-      <ion-note slot="end" style="font-size: 18px;" class="primary"><b>Pilih Ekspedisi Dulu</b></ion-note>
     </ion-item>
   </ion-list>
+
+  <ion-list class="divided">
+    <ion-item-divider color="light" style="border-bottom:none;color: var(--ion-color-primary);">
+      <span style="color: var(--ion-color-primary);">
+        Pesanan
+      </span>
+      <span slot="end" style="margin-right: 15px;text-align: right;">
+        <p style="margin:0;">Harga Jual</p>
+      </span>
+    </ion-item-divider>
+
+    <ion-item button *ngFor="let item of inv.pesanan; let i = index" color="light" [lines]="(inv.pesanan.length===(i+1))?'none':'none'">
+      <ion-label class="no-margin">
+        <ion-icon [name]="cssBarang(item).icon" [color]="cssBarang(item).color"></ion-icon>
+        <strong> {{tool.titleCase(item.nama)}} </strong> {{tool.titleCase(item.warna)}}
+        <p class="note">
+          {{item.toko.toUpperCase()}} | ±{{item.berat | number}} gr | Rp.{{item.hargaBeli | number}}
+        </p>
+      </ion-label>
+      <ion-note slot="end" style="text-align:right;padding: 8px 0;">
+        <p style="margin: 0;">Rp.{{item.hargaJual | number}}</p>
+      </ion-note>
+    </ion-item>
+
+    <ion-item-divider color="grey" style="padding: 0;">
+      <ion-button fill="clear" expand="full" style="margin: 0;width: 100%;">
+        <ion-label>
+          TAMBAH PESANAN
+          <span> +</span>
+        </ion-label>
+      </ion-button>
+    </ion-item-divider>
+
+    <ion-item color="light" lines="none">
+      <ion-label class="no-margin">
+        <b>Subtotal:</b>
+        <p class="note">±{{olahPesanan(inv).beratPaket / 1000 | number}}Kg | Rp.{{(inv.pesanan | pluck:'hargaBeli' | sum) | number}}</p>
+      </ion-label>
+      <ion-note slot="end" style="text-align:right;">
+        <p style="margin: 0;"><strong>Rp.{{(inv.pesanan | pluck:'hargaJual' | sum) | number}}</strong></p>
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="!inv.ekspedisi" color="light" lines="none" button detail>
+      <ion-label>Pilih Ekspedisi</ion-label>
+    </ion-item>
+
+  </ion-list>
+
 </ion-content>

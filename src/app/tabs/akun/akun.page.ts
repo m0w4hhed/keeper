@@ -25,11 +25,13 @@ export class AkunPage {
     private rendererFactory: RendererFactory2,
     @Inject(DOCUMENT) private document: Document
   ) {
-    this.userService.user$.subscribe(res => {
-      console.log('[AKUN] Subscribe User')
-      this.user = res;
-      this.initial = this.initialName(res.displayName)
-    })
+    this.userService.auth().subscribe(user => {
+      if (user) {
+        console.log('[AKUN] Subscribe User')
+        this.user = user;
+        this.initial = this.initialName(user.displayName)
+      }
+    });
     this.renderer = this.rendererFactory.createRenderer(null, null);
   }
 

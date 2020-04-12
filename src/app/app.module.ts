@@ -16,6 +16,7 @@ import { environment } from '../environments/environment';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFireStorageModule, StorageBucket } from '@angular/fire/storage';
 
 // Custom Modules
 import { GraphQLModule } from './modules/graphql.module';
@@ -35,6 +36,11 @@ import { EditInvoicePageModule } from './pages/invoice/edit-invoice/edit-invoice
 import { EditModalPageModule } from './pages/modals/edit-modal/edit-modal.module';
 import { ListTokoPageModule } from './pages/list-toko/list-toko.module';
 import { EditInvoiceTrialPageModule } from './pages/invoice/edit-invoice-trial/edit-invoice-trial.module';
+import { InfoPageModule } from './pages/info/info.module';
+import { TotalanPageModule } from './pages/invoice/totalan/totalan.module';
+import { EditPenerimaPageModule } from './pages/invoice/edit-penerima/edit-penerima.module';
+import { BiayaKeepPageModule } from './pages/invoice/biaya-keep/biaya-keep.module';
+import { EkspedisiPageModule } from './services/ekspedisi/ekspedisi.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -55,10 +61,19 @@ import { EditInvoiceTrialPageModule } from './pages/invoice/edit-invoice-trial/e
     EditModalPageModule,
     EditInvoiceTrialPageModule,
     ListTokoPageModule,
+    BiayaKeepPageModule,
+    EditPenerimaPageModule,
+    TotalanPageModule,
+    InfoPageModule,
+    EkspedisiPageModule,
+    BiayaKeepPageModule,
     // Angularfire Modules
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
-    AngularFirestoreModule.enablePersistence(),
+    AngularFireStorageModule,
+    AngularFirestoreModule.enablePersistence({
+      synchronizeTabs: true
+    }),
     // Custom Modules
     ApolloModule,
     GraphQLModule,
@@ -70,7 +85,8 @@ import { EditInvoiceTrialPageModule } from './pages/invoice/edit-invoice-trial/e
     GooglePlus,
     InAppBrowser,
     AuthGuard,
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    { provide: StorageBucket, useValue: 'keeper-reseller.appspot.com'}
   ],
   bootstrap: [AppComponent]
 })

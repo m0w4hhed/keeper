@@ -1,12 +1,32 @@
 <ion-content color="light" scroll="false" *ngIf="user">
+  
+  <ion-list *ngIf="onload" class="ion-no-padding">
+    <ion-item lines="full" *ngFor="let a of [1,2,3,4,5,6,7]">
+      <ion-label>
+        <h2><ion-skeleton-text animated style="width: 60%;height: 18px"></ion-skeleton-text></h2>
+        <p><ion-skeleton-text animated style="width: 40%"></ion-skeleton-text></p>
+      </ion-label>
+      <ion-note>
+        <h5 style="color: #bb0303">
+          <strong><ion-skeleton-text animated style="width: 75px;height: 20px;"></ion-skeleton-text></strong>
+        </h5>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+  <ion-list *ngIf="!onload && invoices.length === 0" class="ion-no-padding">
+    <div class="image-holder">
+      <img src="assets/img/box-empty.svg" />
+      <ion-label>Belum ada pesanan</ion-label>
+    </div>
+  </ion-list>
 
-  <ion-list color="primary" class="ion-no-padding">
+  <ion-list *ngIf="!onload" color="primary" class="ion-no-padding">
     <ion-item-group color="primary" *ngIf="invoices as invoice">
       <ion-item button (click)="openInvoice(inv)" color="light" line="full" *ngFor="let inv of modeSwitcher(invoice, user) | orderBy:'-waktuOrder'">
         <ion-ripple-effect></ion-ripple-effect>
         <ion-label>
           <h4><b>{{inv.penerima.nama.toUpperCase()}}&nbsp;</b><span class="text-secondary"><span class="dot"></span>&nbsp;+{{inv.penerima.hp}}</span></h4>
-          <p class="text-secondary"><span>+{{inv.pesanan.length}} Produk Pesanan</span></p>
+          <p class="text-secondary"><b>{{tool.titleCase(inv.pesanan[0].nama)}} {{tool.titleCase(inv.pesanan[0].warna)}}</b>,&nbsp;<span>+{{inv.pesanan.length - 1}} Produk</span></p>
 
           <ion-badge [color]="inv.dibayar?'success':'warning'">
             <ion-text *ngIf="inv.total">Rp.{{inv.total | number}}</ion-text>
