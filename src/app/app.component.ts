@@ -22,7 +22,7 @@ export class AppComponent {
 
   initializeApp() {
     this.platform.ready().then(() => {
-      this.statusBar.styleDefault();
+      this.statusBar.styleLightContent(); // .styleDefault();
       this.splashScreen.hide();
       this.userService.auth().subscribe(
         (user) => {

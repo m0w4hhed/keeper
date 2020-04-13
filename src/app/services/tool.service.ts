@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 import { Invoice, Penerima, Pengirim, Ambilan } from './interfaces/invoice';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
-// import { Clipboard } from '@ionic-native/clipboard/ngx';
+import { Clipboard } from '@ionic-native/clipboard/ngx';
 // import { AppVersion } from '@ionic-native/app-version/ngx';
 
 @Injectable({
@@ -15,7 +15,7 @@ export class ToolService {
   constructor(
     private userService: UserService,
     private iab: InAppBrowser,
-    // private clipboard: Clipboard,
+    private clipboard: Clipboard,
     // private appVersion: AppVersion,
   ) {}
 
@@ -44,12 +44,12 @@ export class ToolService {
     const tex = splitText[0];
     let errorPenerima = false;
     // tslint:disable-next-line: max-line-length
-    if (tex.match(/nama:/gi)) { penerima.nama = this.regexx(tex, 'nama:', '\n').replace(/[^a-z A-Z.,()t]/g, '');
+    if (tex.match(/nama:/gi)) { penerima.nama = this.regexx(tex, 'nama:', '\n').replace(/[^a-z A-Z.,()t]/g, '').trim();
     } else { ercode = '2.nama'; errorPenerima = true; }
-    if (tex.match(/alamat:/gi)) { penerima.alamat = this.regexx(tex, 'alamat:', 'kec.');
+    if (tex.match(/alamat:/gi)) { penerima.alamat = this.regexx(tex, 'alamat:', 'kec.').trim();
     } else { ercode = '2.alamat'; errorPenerima = true; }
     if (tex.match(/kec./gi)) {
-      if (tex.match(/kab/gi)) { penerima.kec = this.regexx(tex, 'kec.', 'kab.').replace(/[^A-Z a-z]/g, '');
+      if (tex.match(/kab/gi)) { penerima.kec = this.regexx(tex, 'kec.', 'kab.').replace(/[^A-Z a-z]/g, '').trim();
       } else { ercode = '2.kabupaten'; errorPenerima = true; }
     } else { ercode = '2.kecamatan'; errorPenerima = true; }
     if ( tex.match(/hp:/gi) && this.formatHp(this.regexx(tex, 'hp:', '\n')) ) {
@@ -307,7 +307,7 @@ export class ToolService {
   //   return { appName, appPackageName, appVersionCode, appVersion }
   // }
 
-  // copy(text: string) { return this.clipboard.copy(text); }
-  // paste() { return this.clipboard.paste(); }
+  copy(text: string) { return this.clipboard.copy(text); }
+  paste() { return this.clipboard.paste(); }
 
 }

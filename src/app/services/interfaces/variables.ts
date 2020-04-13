@@ -10,3 +10,8 @@ export const resetTotalan = { // reset totalan invoice
 export const resetEkspedisi = {
     ekspedisi: firebase.firestore.FieldValue.delete()
 }
+
+export const resetInvoiceDibayar = {
+    status: 'keep',
+    waktuDibayar: firebase.firestore.FieldValue.delete()
+}

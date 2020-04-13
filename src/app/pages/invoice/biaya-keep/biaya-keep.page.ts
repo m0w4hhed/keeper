@@ -100,7 +100,7 @@ export class BiayaKeepPage implements OnInit {
   ajukan(type: string, url?: string|null) {
     this.isUploading = true;
     const isPembayaran = (type === 'pembayaran');
-    const pesanan = isPembayaran ? this.invoice.pesanan.filter(brg => (brg.biaya_dibayar === false)).map(brg => brg.barcode) : [];
+    const pesanan = isPembayaran ? this.invoice.pesanan.filter(brg => (brg.biaya_dibayar === false)) : [];
     const pembayaran: Pembayaran = {
       id: this.id,
       bukti: url ? url : '',
@@ -118,7 +118,7 @@ export class BiayaKeepPage implements OnInit {
       () => {
         this.gql.sendNotification(
           `${type.toUpperCase()} KEEP`, `${this.invoice.cs} telah mengajukan ${type} barang keep!`,
-          `pembayaran_keeper`, { image: url ? url : '' }
+          `pembayaran_keeper`, { image: url ? url : '', landingPage: `pembayaran` }
         );
         this.reset();
         this.popup.showToast(`Berhasil mengajukan ${type}!`, 1000);

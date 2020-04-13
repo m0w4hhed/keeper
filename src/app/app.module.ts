@@ -7,6 +7,7 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { GooglePlus } from '@ionic-native/google-plus/ngx';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
+import { Clipboard } from '@ionic-native/clipboard/ngx';
 
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -85,6 +86,7 @@ import { EkspedisiPageModule } from './services/ekspedisi/ekspedisi.module';
     GooglePlus,
     InAppBrowser,
     AuthGuard,
+    Clipboard,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     { provide: StorageBucket, useValue: 'keeper-reseller.appspot.com'}
   ],

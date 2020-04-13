@@ -54,7 +54,7 @@ export class WelcomePage {
     })
     this.onlogin = true;
     loading.present();
-    this.userService.loginWithGoogle().then( // loginWithGoogle()
+    this.userService.login().then( // loginWithGoogle()
       () => {
         console.log('[LOGIN] Sukses')
         this.onlogin = false;

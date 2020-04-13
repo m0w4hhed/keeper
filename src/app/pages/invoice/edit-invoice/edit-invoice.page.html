@@ -7,8 +7,8 @@
     </ion-buttons>
     <ion-title>Informasi Invoice</ion-title>
     <ion-buttons mode="md" slot="end">
-      <ion-button (click)="delete(user, inv)" >
-        <ion-icon slot="icon-only" name="trash"></ion-icon>
+      <ion-button (click)="invoiceActions()" >
+        <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -33,7 +33,7 @@
         <b>{{inv.penerima.nama.toUpperCase()}}</b><br>
         <span>
           +{{inv.penerima.hp}}<br>
-          {{tool.titleCase(inv.penerima.alamat)}},<br>
+          {{tool.titleCase(inv.penerima.alamat)}}<br>
           Kec.{{tool.titleCase(inv.penerima.kec)}},<br>
           Kab.{{inv.penerima.kab}},<br>
           Prov.{{inv.penerima.prov}}

@@ -6,7 +6,7 @@ import { EditModalPage } from '../../modals/edit-modal/edit-modal.page';
 import { Invoice, Penerima, Pengirim, Ambilan } from 'src/app/services/interfaces/invoice';
 import { User } from 'src/app/services/interfaces/user.config';
 
-import { ModalController, ActionSheetController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { ToolService } from 'src/app/services/tool.service';
 import { UserService } from 'src/app/services/user.service';
 import { PopupService } from 'src/app/services/popup.service';
@@ -47,7 +47,34 @@ export class EditInvoicePage implements OnInit {
     this.task = this.switcher.getInvoice(this.user, this.id).subscribe(res => {
       this.invoice = res;
     });
-    // console.log(!!this.tool.getBarang(this.input, this.invoice), !!this.input);
+  }
+
+  invoiceActions() {
+    const buttons = [];
+    const dibayar = {
+      text: 'Invoice Terbayar', icon: 'checkmark-done-circle',
+      handler: () => {
+        this.dataService.setDatas([{
+          path: `invoice/${this.invoice.id}`,
+          partialData: { status: 'dibayar', waktuDibayar: this.tool.getTime() }
+        }]).then(
+          () => this.popup.showToast('Invoice terbayar!', 1000),
+          (err) => this.popup.showAlert('ERROR', err)
+        );
+      }
+    };
+    const hapus = {
+      text: 'Hapus Invoice', icon: 'trash', role: 'destructive',
+      handler: () => { this.delete(this.user, this.invoice); }
+    };
+    const cancel = {
+      text: 'Batal', icon: '', role: 'cancel',
+      handler: () => {}
+    };
+    buttons.push(hapus);
+    if (this.invoice.status === 'keep') { buttons.push(dibayar); }
+    buttons.push(cancel);
+    this.popup.showAction(`INVOICE: ${this.invoice.penerima.nama.toUpperCase()}`, buttons);
   }
 
   async delete(user: User, invoice: Invoice) {
@@ -62,7 +89,7 @@ export class EditInvoicePage implements OnInit {
       );
     }
   }
-  copyInvoice(inv: Invoice) {
+  copyInvoice(inv: Invoice, share?: boolean) {
     let listBrg = ``;
     inv.pesanan.forEach((item, i) => {
       // tslint:disable-next-line: max-line-length
@@ -83,12 +110,14 @@ export class EditInvoicePage implements OnInit {
     // `https://nabiilahstore.com/member/invoice/${inv.id}` + `\n` +
     // `⚠ *PRIORITAS DAPAT BARANG BAGI YG TRANSFER DULUAN YA KAK* 😊🙏🏻`
     ;
-    // this.tool.copy(template).then(
-    //   () => this.popup.showToast('Tagihan tersalin ke clipboard!', 1000),
-    //   (err) => this.popup.showAlert('ERROR SALIN', err)
-    // );
-    template = encodeURIComponent(template);
-    this.tool.wa('', template);
+    this.tool.copy(template).then(
+      () => this.popup.showToast('Tagihan tersalin!', 1000),
+      (err) => this.popup.showAlert('ERROR SALIN', err)
+    );
+    if (share) {
+      template = encodeURIComponent(template);
+      this.tool.wa('', template);
+    }
   }
 
   async updateEkspedisi() {
